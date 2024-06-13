@@ -6,7 +6,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
   const [fontsLoaded, error] = useFonts({
-    DMsans: require("../assets/fonts/DMSans_18pt-Medium.ttf"),
+    DMsans: require("../../assets/fonts/DMSans_18pt-Medium.ttf"),
   });
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function TabLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="sign-up" options={{ headerShown: false }} />
     </Stack>
   );
 }
