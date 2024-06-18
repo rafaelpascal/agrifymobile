@@ -1,10 +1,13 @@
 import { Tabs } from "expo-router";
 import React from "react";
-
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-const home = require("../../assets/icon/Home.png");
+const homeFocused = require("../../assets/navigations/homeFocused.png");
+const home = require("../../assets/navigations/home.png");
+const salesFocused = require("../../assets/navigations/salesFocused.png");
+const sales = require("../../assets/navigations/sales.png");
+import { Image } from "react-native";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -21,22 +24,16 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
-              color={color}
-            />
+            <Image source={focused ? homeFocused : home} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="sales"
         options={{
-          title: "Explore",
+          title: "Sales",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
-              color={color}
-            />
+            <Image source={focused ? salesFocused : sales} />
           ),
         }}
       />

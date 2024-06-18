@@ -27,7 +27,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <StatusBar style="auto" hidden={true} />
+      <StatusBar style="auto" hidden={false} />
       {isLoaded ? (
         <View className="relative flex-1 items-center justify-evenly bg-[#fff] px-3">
           <Image

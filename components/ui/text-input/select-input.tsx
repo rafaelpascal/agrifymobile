@@ -12,16 +12,23 @@ import {
 // import { MaterialIcons } from "@expo/vector-icons";
 const check = require("../../../assets/icon/check.png");
 const search = require("../../../assets/icon/search.png");
+const loading = require("../../../assets/gif/loading.gif");
 
 interface CustomDropdownProps {
   options: string[];
   selectedValue: string;
+  placeholder: string;
+  InputClass: string;
+  isLoading: boolean;
   onSelect: (value: string) => void;
 }
 
 export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   options,
   selectedValue,
+  placeholder,
+  InputClass,
+  isLoading,
   onSelect,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,6 +40,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
   const handleSelect = (value: string) => {
     onSelect(value);
+    setModalVisible(false);
   };
 
   return (
@@ -45,20 +53,22 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
           <Text>{selectedValue}</Text>
         ) : (
           <Text className="text-[#A9A9A9] text-[14px] font-semibold font-DMSans">
-            Select Location
+            {placeholder}
           </Text>
         )}
       </TouchableOpacity>
       <Modal
         visible={modalVisible}
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View className="w-full h-full flex relative bg-[#435060]/50 backdrop-blur-[10px] transition-[.5s] flex-1 justify-center items-center">
+          <View className="w-full h-full flex relative transition-[.5s] flex-1 justify-center items-center">
             <TouchableWithoutFeedback onPress={() => {}}>
-              <View className="w-[315px] h-[276px] bg-white px-4 py-2 overflow-y-scroll absolute top-[49%] rounded-lg shadow-lg">
+              <View
+                className={`w-[315px] h-[276px] bg-white px-4 py-2 overflow-y-scroll absolute rounded-lg shadow-lg ${InputClass}`}
+              >
                 <View className="h-[32px] relative px-2 flex flex-row justify-between items-center w-full rounded-[4px] border-[1px] border-[#CCD0DC]">
                   <TextInput
                     className="h-full w-full"
@@ -72,18 +82,27 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
                     <Image source={search} />
                   </View>
                 </View>
-                <ScrollView className="flex-grow">
-                  {filteredOptions.map((option, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      className="h-auto flex py-4 flex-row justify-between items-start active:bg-black px-2 rounded-md"
-                      onPress={() => handleSelect(option)}
-                    >
-                      <Text>{option}</Text>
-                      {selectedValue === option && <Image source={check} />}
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                {isLoading ? (
+                  <View className="w-full flex flex-col justify-center items-center">
+                    <Image source={loading} />
+                    <Text className="text-[18px] font-DMSans font-normal text-[#999999]">
+                      Loading....
+                    </Text>
+                  </View>
+                ) : (
+                  <ScrollView className="flex-grow">
+                    {filteredOptions.map((option, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        className="h-auto flex py-4 flex-row justify-between items-start active:bg-black px-2 rounded-md"
+                        onPress={() => handleSelect(option)}
+                      >
+                        <Text>{option}</Text>
+                        {selectedValue === option && <Image source={check} />}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
               </View>
             </TouchableWithoutFeedback>
           </View>

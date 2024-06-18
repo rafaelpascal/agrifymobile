@@ -1,8 +1,14 @@
+import clsx, { ClassArray } from "clsx";
+import { twMerge } from "tailwind-merge";
 interface CreateAvatarUrlArgs {
   /** Can be the user's name or the imgSrc. */
   avatarUrl: string;
   /** @see https://ui-avatars.com/ for additional properties. */
   additionalParams?: Record<string, string | number>;
+}
+
+export function cn(...inputs: ClassArray) {
+  return twMerge(clsx(inputs));
 }
 
 export const createAvatarUrl = (args: CreateAvatarUrlArgs) => {
@@ -15,8 +21,8 @@ export const createAvatarUrl = (args: CreateAvatarUrlArgs) => {
   params.append("size", "256");
 
   if (additionalParams) {
-    Object.entries(additionalParams).forEach(([key, value]) => {
-      params.append(key, String(value));
+    Object.keys(additionalParams).forEach((key) => {
+      params.append(key, String(additionalParams[key]));
     });
   }
 

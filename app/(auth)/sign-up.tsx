@@ -30,6 +30,7 @@ const SignUp = () => {
   const [confirmpin, setConfirmPin] = useState("");
   const [otpPage, setOtpPage] = useState(false);
   const [ispassWord, setispassWord] = useState(false);
+  const [isSelectDropdown, setisSelectDropdown] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clear, setClear] = useState(false);
   const [isTimedOut, setIsTimedOut] = useState<boolean>(false);
@@ -37,7 +38,7 @@ const SignUp = () => {
   const [states, setStates] = useState([]);
   const [pin, setPin] = useState("");
   const [capitals, setCapitals] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -52,20 +53,26 @@ const SignUp = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const fetchStates = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        "https://nga-states-lga.onrender.com/fetch"
+      );
+      const statesData = response.data;
+      setStates(statesData);
+      const capitalsData = statesData.map(
+        (state: { capital: any }) => state.capital
+      );
+      setCapitals(capitalsData);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get("https://nigeria-states-towns-lga.onrender.com/api/states")
-      .then((response) => {
-        const statesData = response.data;
-        setStates(statesData);
-        const capitalsData = statesData.map((state: any) => state.capital);
-        setCapitals(capitalsData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      });
+    fetchStates();
   }, []);
 
   const handleOtpPage = () => {
@@ -327,14 +334,20 @@ const SignUp = () => {
                   </View>
                 </View>
                 <View className="my-2">
-                  <Text className="text-[12px] font-normal text-[#343434] font-DMSans">
-                    Location
-                  </Text>
-                  <View className="mt-2 relative border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
+                  <TouchableOpacity
+                    onPress={() => setisSelectDropdown(!isSelectDropdown)}
+                    className="text-[12px] font-normal text-[#343434] font-DMSans"
+                  >
+                    <Text>Location</Text>
+                  </TouchableOpacity>
+                  <View className="mt-2 border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
                     <Image source={location} />
                     <CustomDropdown
-                      options={capitals}
+                      InputClass="top-[52%]"
+                      isLoading={loading}
+                      options={states}
                       selectedValue={selectedValue}
+                      placeholder="Select Location"
                       onSelect={(value) => setSelectedValue(value)}
                     />
                     <Image source={dropdown} className="absolute right-3" />
