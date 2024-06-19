@@ -42,7 +42,7 @@ export const CreatedModal = ({ isOpen, closeModal }: IModalPropsType) => {
 
   return (
     <BaseModal isOpen={isOpen} closeModal={closeModal}>
-      <View className="flex bg-themeWhite w-full  items-center justify-center">
+      <View className="flex bg-themeWhite w-full p-[28px] items-center justify-center">
         <View className="flex flex-col items-center justify-center py-6 lg:w-[336px]">
           <Image source={agrifymodal} />
           <Text className="pb-2 text-center text-[16px] font-DMSans font-semibold">
@@ -53,7 +53,7 @@ export const CreatedModal = ({ isOpen, closeModal }: IModalPropsType) => {
           </Text>
         </View>
       </View>
-      <View className="sticky bg-themeWhite bottom-0 z-10 mt-4 flex h-auto items-center justify-center gap-3">
+      <View className="sticky bg-themeWhite bottom-0 p-[28px] z-10 mt-4 flex h-auto items-center justify-center gap-3">
         <TouchableOpacity
           className="w-full h-auto flex justify-center items-center rounded-[10px] bg-themeGreen sm:h-[46px] text-[#fff] [@media(max-width:800px)]:p-3 p-4"
           onPress={handlePress}

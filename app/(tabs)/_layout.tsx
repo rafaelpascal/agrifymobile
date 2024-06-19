@@ -1,12 +1,15 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 const homeFocused = require("../../assets/navigations/homeFocused.png");
 const home = require("../../assets/navigations/home.png");
 const salesFocused = require("../../assets/navigations/salesFocused.png");
 const sales = require("../../assets/navigations/sales.png");
+const shopFocused = require("../../assets/navigations/shop.png");
+const shop = require("../../assets/navigations/shop1.png");
+const settingFocused = require("../../assets/navigations/settingfocused.png");
+const setting = require("../../assets/navigations/setting.png");
 import { Image } from "react-native";
 
 export default function TabLayout() {
@@ -17,6 +20,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
+        // tabBarStyle: { height: 60 },
       }}
     >
       <Tabs.Screen
@@ -26,6 +30,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Image source={focused ? homeFocused : home} />
           ),
+          tabBarLabelStyle: {
+            fontSize: 14,
+          },
         }}
       />
       <Tabs.Screen
@@ -35,6 +42,33 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Image source={focused ? salesFocused : sales} />
           ),
+          tabBarLabelStyle: {
+            fontSize: 14,
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="shop"
+        options={{
+          title: "Shop",
+          tabBarIcon: ({ color, focused }) => (
+            <Image source={focused ? shopFocused : shop} />
+          ),
+          tabBarLabelStyle: {
+            fontSize: 14,
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="psettings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, focused }) => (
+            <Image source={focused ? settingFocused : setting} />
+          ),
+          tabBarLabelStyle: {
+            fontSize: 14,
+          },
         }}
       />
     </Tabs>

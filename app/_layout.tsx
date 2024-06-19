@@ -6,7 +6,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
   const [fontsLoaded, error] = useFonts({
-    DMsans: require("../assets/fonts/DMSans_18pt-Medium.ttf"),
+    "DM Sans": require("../assets/fonts/DMSans_18pt-Medium.ttf"),
   });
 
   useEffect(() => {

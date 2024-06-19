@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     maxHeight: 540,
     backgroundColor: "#fff", // Use your theme color here
     borderRadius: 20,
-    padding: 16,
+    padding: 0,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,

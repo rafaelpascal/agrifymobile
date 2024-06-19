@@ -3,10 +3,14 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import * as ScreenOrientation from "expo-screen-orientation";
 
 export default function HomeScreen() {
+  const [orientation, setOrientation] = useState(
+    ScreenOrientation.Orientation.PORTRAIT_UP
+  );
   const [isLoaded, setIsLoaded] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState("en");
 
   const options = [
     { name: "English", abbreviation: "en" },
@@ -15,6 +19,17 @@ export default function HomeScreen() {
     { name: "Hausa", abbreviation: "ha" },
   ];
 
+  useEffect(() => {
+    const subscription = ScreenOrientation.addOrientationChangeListener(
+      (event) => {
+        setOrientation(event.orientationInfo.orientation);
+      }
+    );
+
+    return () => {
+      ScreenOrientation.removeOrientationChangeListener(subscription);
+    };
+  }, []);
   useEffect(() => {
     setTimeout(() => {
       setIsLoaded(true);
@@ -27,7 +42,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <StatusBar style="auto" hidden={false} />
+      <StatusBar style="auto" hidden={true} />
       {isLoaded ? (
         <View className="relative flex-1 items-center justify-evenly bg-[#fff] px-3">
           <Image
