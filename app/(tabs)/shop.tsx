@@ -16,6 +16,8 @@ import { DashboardCardRow } from "../../components/grouped-components/dashboard-
 import { PreviousItems } from "../../components/ui/product/PreviousItems";
 import { DashboardCardProps } from "../../components/ui/dashboardCard/dashboardCard";
 import { ShopProductDetails } from "../../components/ui/modals/ShopProductDetails";
+import { all_product, get_previous_sales } from "../../utils/apiService";
+import { useUser } from "../../context/user-provider";
 import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 const product = require("../../assets/images/product.png");
@@ -23,39 +25,37 @@ const sales = require("../../assets/images/sales.png");
 const stock = require("../../assets/images/stock.png");
 const plus = require("../../assets/images/plus.png");
 
-const items = [
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Irish Potatoes",
-    qty: "5 baskets",
-    status: false,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Sweet Potatoes",
-    qty: "20 baskets",
-    status: true,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Yam",
-    qty: "3 baskets",
-    status: true,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Irish Potatoes",
-    qty: "5 baskets",
-    status: false,
-    value: 200,
-  },
-];
+type Item = {
+  icon: string;
+  title: string;
+  qty: number;
+  status: boolean;
+  value: number;
+  amount: number;
+};
+type ViewItem = {
+  icon: string;
+  title: string;
+  qty: number;
+  status: boolean;
+  value: number;
+  amount: number;
+};
+
+const defaultItem: ViewItem = {
+  icon: "",
+  title: "",
+  qty: 0,
+  status: false,
+  value: 0,
+  amount: 0,
+};
 
 export default function Shops() {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const { user } = useUser();
+  const [items, setItems] = useState<Item[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [itemPressed, setItemPressed] = useState<ViewItem>(defaultItem);
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [dashboardHeroCards, setDashboardHeroCards] = useState<
     DashboardCardProps[]
@@ -63,21 +63,89 @@ export default function Shops() {
     {
       icon: product,
       title: "Total Product",
-      value: "0",
+      value: 0,
     },
     {
       icon: sales,
       title: "Total Sales",
-      value: "3000",
+      value: 0,
     },
     {
       icon: stock,
       title: "Stock Left",
-      value: "0",
+      value: 0,
     },
   ]);
 
-  const handleItemPressed = (item: any) => {
+  const currencyFormatter = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  //
+  useEffect(() => {
+    const getAllProduct = async () => {
+      try {
+        const allproduct = await all_product();
+        const all_previous_sales = await get_previous_sales(user);
+        const previoussales = all_previous_sales?.completed_sales.rows;
+        const productCount = allproduct.data?.allproduct.count;
+        const products = allproduct.data?.allproduct.rows;
+
+        const transformedData = products.map((product: any) => {
+          const firstImage = product.images[0];
+          const firstPricing = product.pricings[0];
+
+          return {
+            icon: firstImage.imageUrl,
+            title: product.productName,
+            qty: `${product.currentQuantity}`,
+            status: product.status || false,
+            value: firstPricing.price,
+          };
+        });
+
+        const totalCurrentQuantity = products.reduce(
+          (sum: number, product: any) =>
+            sum + (parseInt(product.currentQuantity) || 0),
+          0
+        );
+
+        const pptransformedData = previoussales.map((sales: any) => {
+          return {
+            amount: parseFloat(sales.amount),
+          };
+        });
+
+        const totalSalesAmount = pptransformedData.reduce(
+          (sum: number, sale: ViewItem) => sum + sale.amount,
+          0
+        );
+        const newamout = currencyFormatter.format(totalSalesAmount);
+
+        const updatedDashboardHeroCards = dashboardHeroCards.map((card) => {
+          if (card.title === "Total Product") {
+            return { ...card, value: productCount || 0 };
+          } else if (card.title === "Stock Left") {
+            return { ...card, value: totalCurrentQuantity || 0 };
+          } else if (card.title === "Total Sales") {
+            return { ...card, value: newamout || 0 };
+          }
+          return card;
+        });
+
+        setItems(transformedData);
+        setDashboardHeroCards(updatedDashboardHeroCards);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllProduct();
+  }, []);
+
+  const handleItemPressed = (item: ViewItem) => {
+    setItemPressed(item);
     setIsModalOpen(true);
   };
 
@@ -135,7 +203,7 @@ export default function Shops() {
                   Item List
                 </Text>
                 <Text className="text-themeGreen text-[14px] font-semibold font-DMSans ">
-                  (4)
+                  ({items.length})
                 </Text>
               </View>
               <View className="flex h-auto flex-col w-full justify-center items-start">
@@ -155,7 +223,9 @@ export default function Shops() {
             </ScrollView>
           </View>
           <ShopProductDetails
-            status={false}
+            userId=""
+            itemp={itemPressed}
+            status={itemPressed.status}
             isOpen={isModalOpen}
             closeModal={handleModalClose}
           />

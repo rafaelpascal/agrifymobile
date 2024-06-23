@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
+import { UserProvider } from "@/context/user-provider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,8 +18,10 @@ export default function TabLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-    </Stack>
+    <UserProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+      </Stack>
+    </UserProvider>
   );
 }

@@ -3,7 +3,7 @@ import { View, Image, Text, ImageSourcePropType } from "react-native";
 export interface DashboardCardProps {
   icon: ImageSourcePropType;
   title: string;
-  value: string;
+  value: string | number;
   children?: React.ReactNode;
   childrenClassName?: string;
   className?: string;

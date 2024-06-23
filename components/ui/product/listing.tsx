@@ -26,7 +26,7 @@ export const BaseItem = (props: DashboardCardProps) => {
           <Text className="text-[14px] font-bold font-DMSans ">{title}</Text>
           <View className="flex flex-row justify-start items-center">
             <Text className="mr-2 font-DMSans font-normal text-[#8F94A8] text-[13px]">
-              {qty}
+              {qty} Baskets
             </Text>
             {status === true ? (
               <View className="flex justify-center items-start rounded-[4px] bg-themeGreen/10">
@@ -46,11 +46,11 @@ export const BaseItem = (props: DashboardCardProps) => {
       </View>
       {status === true ? (
         <Text className="text-[16px] text-[#25313E] font-DMSans font-bold">
-          ₦25,000
+          ₦{value}
         </Text>
       ) : (
         <Text className="text-[16px] text-[#D48B1F] font-DMSans font-bold">
-          ₦25,000
+          ₦{value}
         </Text>
       )}
     </View>

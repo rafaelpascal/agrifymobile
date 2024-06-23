@@ -28,7 +28,17 @@ type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList>
 >;
 
+interface Item {
+  icon: string;
+  title: string;
+  qty: number;
+  status: boolean;
+  value: number;
+}
+
 interface IModalPropsType {
+  itemp: Item;
+  userId: string | undefined;
   isOpen: boolean;
   closeModal: () => void;
   status: boolean;
@@ -39,12 +49,14 @@ interface ProductDetailsModalType {
 }
 
 export const ShopProductDetails = ({
+  userId,
   isOpen,
+  itemp,
   closeModal,
   status,
 }: IModalPropsType) => {
   return (
-    <BaseModal isOpen={isOpen} closeModal={closeModal}>
+    <BaseModal userId={userId} isOpen={isOpen} closeModal={closeModal}>
       <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[12px] flex justify-between items-center w-full">
         <Text className="text-[16px] font-bold font-DMSans text-themeGreen">
           Product Details
@@ -55,8 +67,11 @@ export const ShopProductDetails = ({
       </View>
       <View className="flex bg-themeWhite w-full p-[20px] items-start justify-start">
         <View className="flex flex-row justify-start items-start mb-2">
-          <Image source={productImage} className="rounded-lg mr-3" />
-          <Image source={productImage} className="rounded-lg" />
+          <Image
+            source={{ uri: itemp.icon }}
+            className="rounded-lg mb-3"
+            style={{ width: 50, height: 50 }}
+          />
         </View>
         <View className="border-[1px] border-[#E6E6E8] px-3 rounded-[8px]">
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -72,7 +87,7 @@ export const ShopProductDetails = ({
               Product Name:
             </Text>
             <Text className="text-center text-[12px] font-DMSans font-bold text-[#25313E]">
-              Cassava
+              {itemp.title}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -80,7 +95,7 @@ export const ShopProductDetails = ({
               Total Quantity:
             </Text>
             <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
-              5 baskets
+              {itemp.qty} baskets
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -104,7 +119,7 @@ export const ShopProductDetails = ({
               Price:
             </Text>
             <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
-              ₦18,700
+              ₦{itemp.value}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -117,8 +132,8 @@ export const ShopProductDetails = ({
           </View>
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between">
-          {status === true ? (
-            <View className="bg-themeGreen/10 w-full  rounded-[4px] px-2 py-1">
+          {itemp.qty <= 100 ? (
+            <View className="bg-themeGreen/10 w-full  rounded-[4px] px-2 py-3">
               <Text className="text-center text-[12px] font-DMSans font-bold text-themeGreen">
                 You have 4 Baskets Left
               </Text>

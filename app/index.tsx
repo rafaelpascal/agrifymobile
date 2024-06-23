@@ -3,9 +3,35 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import { useNavigation } from "@react-navigation/native";
 import * as ScreenOrientation from "expo-screen-orientation";
+import {
+  CompositeNavigationProp,
+  NavigatorScreenParams,
+} from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+
+type RootStackParamList = {
+  "(tabs)": NavigatorScreenParams<TabParamList>;
+  "+not-found": undefined;
+  Other: undefined;
+};
+
+type TabParamList = {
+  Home: undefined;
+  Profile: undefined;
+  Settings: undefined;
+  Shop: undefined;
+};
+
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<RootStackParamList, "(tabs)">,
+  BottomTabNavigationProp<TabParamList>
+>;
 
 export default function HomeScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const [orientation, setOrientation] = useState(
     ScreenOrientation.Orientation.PORTRAIT_UP
   );

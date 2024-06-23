@@ -12,6 +12,8 @@ import { DashboardArea } from "@/components/ui/layout/dashboard/DashboardArea";
 import { CustomDropdown } from "../../components/ui/text-input/select-input";
 import { AntDesign } from "@expo/vector-icons";
 import { PINinput } from "../../components/ui/text-input/pin-input";
+import OTPTextInput from "react-native-otp-textinput";
+import CountdownTimer from "../../components/ui/display/CountdownTimer";
 const changePin = require("../../assets/icon/lock.png");
 const payment = require("../../assets/icon/moneys.png");
 const notification = require("../../assets/icon/notification.png");
@@ -27,9 +29,13 @@ import axios from "axios";
 
 export default function personalsettings() {
   const [buttonClicked, setbuttonClicked] = useState(false);
+  const [otpPage, setotpPage] = useState(false);
+  const [otp, setOTP] = useState("");
+  const [ispassWord, setispassWord] = useState(false);
   const [confirmpin, setConfirmPin] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSelectDropdown, setisSelectDropdown] = useState(false);
+  const [isTimedOut, setIsTimedOut] = useState<boolean>(false);
   const [isConfirmPass, setisConfirmPass] = useState<boolean>(false);
   const [isPersonalInfo, setisPersonalInfo] = useState(false);
   const [isChangePin, setisChangePin] = useState(false);
@@ -71,6 +77,10 @@ export default function personalsettings() {
   const handlePinChange = (newPin: string) => {
     setPin(newPin);
   };
+
+  const handleOTPChange = (otp: string) => {
+    setOTP(otp);
+  };
   const handlepersonalInfo = () => {
     setbuttonClicked(true);
     setisPersonalInfo(true);
@@ -84,6 +94,14 @@ export default function personalsettings() {
     setConfirmPin(newPin);
   };
 
+  const handleTimeout = () => {
+    setIsTimedOut(true);
+  };
+
+  const handleOtpSubmit = () => {
+    setispassWord(true);
+  };
+
   const handlePinSubmit = () => {
     setClear(true);
     setisConfirmPass(true);
@@ -92,6 +110,11 @@ export default function personalsettings() {
   const handleSubmitform = () => {
     setIsModalOpen(true);
   };
+
+  // const handlePinChange = () => {
+  //   setIsModalOpen(true);
+  // };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -217,61 +240,130 @@ export default function personalsettings() {
             {isChangePin && (
               <View className="h-full w-full">
                 {isConfirmPass ? (
-                  <View className="relative h-full w-full">
-                    <TouchableOpacity
-                      onPress={() => setisConfirmPass(false)}
-                      className="bg-themeGreen/10 border-[1px] border-themeGreen w-[78px] h-[35px] flex flex-row items-center justify-center rounded-[8px]"
-                    >
-                      <Image source={back} />
-                      <Text className="text-[12px] ml-2 p-0 text-[#2F2F2F] font-normal">
-                        Go Back
-                      </Text>
-                    </TouchableOpacity>
-                    <View className="h-auto w-full flex justify-start items-start">
-                      <Text className="text-[24px] font-bold text-[#343434] font-DMSans">
-                        Secure your new account
-                      </Text>
-                      <View className="w-full mt-[30px] h-[400px] flex justify-start items-start">
-                        <Text className="mb-4 text-[14px] font-bold font-DMSans">
-                          Confirm Pin
-                        </Text>
-                        <PINinput
-                          length={4}
-                          onChange={handleconfirmPinChange}
-                          clear={clear}
-                        />
-                        <View className="w-full h-[30px] mt-4 ">
-                          {pin === confirmpin ? (
-                            <Text className="text-[14px] font-bold font-DMSans text-themeGreen">
-                              Pin match
+                  <>
+                    {otpPage ? (
+                      <View className="h-full w-full p-4">
+                        <TouchableOpacity
+                          onPress={() => setotpPage(false)}
+                          className="bg-themeGreen/10 border-[1px] border-themeGreen w-[78px] h-[35px] flex flex-row items-center justify-center rounded-[8px]"
+                        >
+                          <Image source={back} />
+                          <Text className="text-[12px] ml-2 p-0 text-[#2F2F2F] font-normal">
+                            Go Back
+                          </Text>
+                        </TouchableOpacity>
+                        <View className="h-auto w-full flex justify-start items-start">
+                          <Text className="text-[24px] font-bold text-[#343434] font-DMSans">
+                            Enter the code, sent to your phone.
+                          </Text>
+                          <View className="w-full mt-[10px] h-[400px] flex justify-start items-start">
+                            <Text className="mb-4 text-[14px] font-bold font-DMSans">
+                              Input OTP received
                             </Text>
+                            <OTPTextInput
+                              inputCount={5}
+                              handleTextChange={handleOTPChange}
+                              containerStyle={{
+                                marginBottom: 0,
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                              textInputStyle={{
+                                borderWidth: 1,
+                                borderColor: "#000",
+                                borderRadius: 50,
+                                width: 46,
+                                height: 46,
+                                marginHorizontal: 5,
+                              }}
+                            />
+                            <View className="h-[36px] flex justify-between items-center flex-row">
+                              {isTimedOut === false && (
+                                <Text className="mr-[2px]">Resend in</Text>
+                              )}
+                              <CountdownTimer
+                                duration={120}
+                                onTimeout={handleTimeout}
+                              />
+                            </View>
+                          </View>
+                        </View>
+                        {otp.length !== 5 ? (
+                          <TouchableOpacity className="h-[50px] w-[100%] bg- rounded-[4px] bg-themeGrey flex justify-center items-center">
+                            <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
+                              Proceed
+                            </Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={handleOtpSubmit}
+                            className="h-[50px] w-[100%] bg-themeGreen rounded-[4px] flex justify-center items-center"
+                          >
+                            <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
+                              Proceed
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ) : (
+                      <View className="relative h-full w-full">
+                        <TouchableOpacity
+                          onPress={() => setisConfirmPass(false)}
+                          className="bg-themeGreen/10 border-[1px] border-themeGreen w-[78px] h-[35px] flex flex-row items-center justify-center rounded-[8px]"
+                        >
+                          <Image source={back} />
+                          <Text className="text-[12px] ml-2 p-0 text-[#2F2F2F] font-normal">
+                            Go Back
+                          </Text>
+                        </TouchableOpacity>
+                        <View className="h-auto w-full flex justify-start items-start">
+                          <Text className="text-[24px] font-bold text-[#343434] font-DMSans">
+                            Change PIN
+                          </Text>
+                          <View className="w-full mt-[10px] flex justify-start items-start">
+                            <Text className="mb-4 text-[14px] font-bold font-DMSans">
+                              Confirm Pin
+                            </Text>
+                            <PINinput
+                              length={4}
+                              onChange={handleconfirmPinChange}
+                              clear={clear}
+                            />
+                            <View className="w-full h-[30px] mt-4 ">
+                              {pin === confirmpin ? (
+                                <Text className="text-[14px] font-bold font-DMSans text-themeGreen">
+                                  Pin match
+                                </Text>
+                              ) : (
+                                <Text className="text-[14px] font-bold font-DMSans text-themeDanger">
+                                  Pin Doesn't match
+                                </Text>
+                              )}
+                            </View>
+                          </View>
+                        </View>
+                        <View className="absolute bottom-0 w-full">
+                          {pin !== confirmpin ? (
+                            <TouchableOpacity className="h-[50px] w-[100%] bg-[#E2E2E2] rounded-[4px] flex justify-center items-center">
+                              <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
+                                Done
+                              </Text>
+                            </TouchableOpacity>
                           ) : (
-                            <Text className="text-[14px] font-bold font-DMSans text-themeDanger">
-                              Pin Doesn't match
-                            </Text>
+                            <TouchableOpacity
+                              onPress={() => setotpPage(true)}
+                              className="h-[50px] w-[100%] bg-themeGreen rounded-[4px] flex justify-center items-center"
+                            >
+                              <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
+                                Done
+                              </Text>
+                            </TouchableOpacity>
                           )}
                         </View>
                       </View>
-                    </View>
-                    <View className="absolute bottom-0 w-full">
-                      {pin !== confirmpin ? (
-                        <TouchableOpacity className="h-[50px] w-[100%] bg-[#E2E2E2] rounded-[4px] flex justify-center items-center">
-                          <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
-                            Done
-                          </Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={handleSubmitform}
-                          className="h-[50px] w-[100%] bg-themeGreen rounded-[4px] flex justify-center items-center"
-                        >
-                          <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
-                            Done
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  </View>
+                    )}
+                  </>
                 ) : (
                   <View className="relative h-full w-full">
                     <TouchableOpacity
@@ -288,11 +380,11 @@ export default function personalsettings() {
                     </TouchableOpacity>
                     <View className="h-auto w-full flex justify-start items-start">
                       <Text className="text-[24px] font-bold text-[#343434] font-DMSans">
-                        Secure your new account
+                        Change PIN
                       </Text>
-                      <View className="w-full mt-[30px] h-[400px] flex justify-start items-start">
+                      <View className="w-full mt-[10px] flex justify-start items-start">
                         <Text className="mb-4 text-[14px] font-bold font-DMSans">
-                          Create new account PIN
+                          Please enter your new PIN
                         </Text>
                         <PINinput
                           length={4}

@@ -28,6 +28,7 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 interface IModalPropsType {
+  userId: string | undefined;
   isOpen: boolean;
   closeModal: () => void;
   status: boolean;
@@ -38,12 +39,13 @@ interface ProductDetailsModalType {
 }
 
 export const ProductDetails = ({
+  userId,
   isOpen,
   closeModal,
   status,
 }: IModalPropsType) => {
   return (
-    <BaseModal isOpen={isOpen} closeModal={closeModal}>
+    <BaseModal userId={userId} isOpen={isOpen} closeModal={closeModal}>
       <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[12px] flex justify-between items-center w-full">
         <Text className="text-[16px] font-bold font-DMSans text-themeGreen">
           Product Details

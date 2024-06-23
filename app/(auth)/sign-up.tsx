@@ -11,20 +11,47 @@ import {
   StyleSheet,
 } from "react-native";
 import { Link } from "expo-router";
+import { useUser } from "../../context/user-provider";
 const image = require("../../assets/icon/lets-icons_back-light.png");
-const user = require("../../assets/icon/user.png");
+const usersvg = require("../../assets/icon/user.png");
 const location = require("../../assets/icon/location.png");
 const dropdown = require("../../assets/icon/dropdown.png");
 const phone = require("../../assets/icon/phone.png");
-const email = require("../../assets/icon/email.png");
+const emailsvg = require("../../assets/icon/email.png");
 import { PINinput } from "../../components/ui/text-input/pin-input";
 import { CustomDropdown } from "../../components/ui/text-input/select-input";
 import CountdownTimer from "../../components/ui/display/CountdownTimer";
 import OTPTextInput from "react-native-otp-textinput";
 import { CreatedModal } from "../../components/ui/modals/CreatedModal";
+import { register, verifyacc, createpin } from "../../utils/apiService";
+import { Accountexist } from "../../components/ui/modals/Accountexist";
+import {
+  CompositeNavigationProp,
+  NavigatorScreenParams,
+} from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+
 import axios from "axios";
 
+type RootStackParamList = {
+  "(tabs)": NavigatorScreenParams<TabParamList>;
+  "+not-found": undefined;
+  Other: undefined;
+};
+
+type TabParamList = {
+  Home: undefined;
+  Profile: undefined;
+  Settings: undefined;
+};
+
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<RootStackParamList, "(tabs)">,
+  BottomTabNavigationProp<TabParamList>
+>;
 const SignUp = () => {
+  const { user, setUser } = useUser();
   const [selectedValue, setSelectedValue] = useState("");
   const [otp, setOTP] = useState("");
   const [confirmpin, setConfirmPin] = useState("");
@@ -35,7 +62,11 @@ const SignUp = () => {
   const [clear, setClear] = useState(false);
   const [isTimedOut, setIsTimedOut] = useState<boolean>(false);
   const [isConfirmPass, setisConfirmPass] = useState<boolean>(false);
+  const [isExistModalOpen, setIsExistModalOpen] = useState(false);
   const [states, setStates] = useState([]);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
   const [pin, setPin] = useState("");
   const [capitals, setCapitals] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -49,6 +80,7 @@ const SignUp = () => {
   const handleOTPChange = (otp: string) => {
     setOTP(otp);
   };
+
   const handleInputChange = (value: string, name: string) => {
     setFormData({ ...formData, [name]: value });
   };
@@ -71,20 +103,40 @@ const SignUp = () => {
     }
   };
 
+  const handleFormsubmit = async () => {
+    try {
+      setOtpPage(true);
+
+      // const data = {
+      //   firstName: formData.firstName,
+      //   lastName: formData.lastName,
+      //   location: selectedValue,
+      //   phone: formData.phone,
+      //   email: formData.email,
+      // };
+
+      // await register(data);
+      // setEmail(formData.email);
+      // setName(formData.firstName);
+      // setOtpPage(true);
+      // setFormData({
+      //   firstName: "",
+      //   lastName: "",
+      //   phone: "",
+      //   email: "",
+      // });
+    } catch (error: any) {
+      setMessage(error.response.data.message);
+      setIsExistModalOpen(true);
+    }
+  };
+
   useEffect(() => {
     fetchStates();
   }, []);
 
-  const handleOtpPage = () => {
-    setOtpPage(true);
-  };
-
   const handleTimeout = () => {
     setIsTimedOut(true);
-  };
-
-  const handleOtpSubmit = () => {
-    setispassWord(true);
   };
 
   const handlePinChange = (newPin: string) => {
@@ -101,10 +153,39 @@ const SignUp = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+    setIsExistModalOpen(false);
   };
 
-  const handleSubmitform = () => {
-    setIsModalOpen(true);
+  const handleOtpSubmit = async () => {
+    try {
+      setispassWord(true);
+
+      // const data = {
+      //   otp,
+      //   email,
+      // };
+      // const verifyres = await verifyacc(data);
+      // if (verifyres) {
+      //   setispassWord(true);
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmitform = async () => {
+    try {
+      // const data = {
+      //   pin,
+      //   email,
+      // };
+      // const res = await createpin(data);
+      // setUser(res.data.fndmarId.id);
+      setIsModalOpen(true);
+      setClear(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -304,9 +385,9 @@ const SignUp = () => {
                     First Name
                   </Text>
                   <View className="mt-2 border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
-                    <Image source={user} />
+                    <Image source={usersvg} />
                     <TextInput
-                      className="h-[50px] w-full rounded-[4px] px-3 text-[#A9A9A9] text-[13px] font-semibold font-DMSans"
+                      className="h-[50px] w-full rounded-[4px] px-3 text-[#343434] text-[13px] font-semibold font-DMSans"
                       placeholder="Enter your First Name"
                       placeholderTextColor="#999"
                       onChangeText={(text) =>
@@ -321,9 +402,9 @@ const SignUp = () => {
                     Last Name
                   </Text>
                   <View className="mt-2 border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
-                    <Image source={user} />
+                    <Image source={usersvg} />
                     <TextInput
-                      className="h-[50px] rounded-[4px] px-3 text-[#A9A9A9] text-[13px] font-semibold font-DMSans"
+                      className="h-[50px] rounded-[4px] px-3 text-[#343434] text-[13px] font-semibold font-DMSans"
                       placeholder="Enter your Last Name"
                       placeholderTextColor="#999"
                       onChangeText={(text) =>
@@ -360,7 +441,7 @@ const SignUp = () => {
                   <View className="mt-2 border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
                     <Image source={phone} />
                     <TextInput
-                      className="h-[50px] w-full rounded-[4px] px-3 text-[#A9A9A9] text-[13px] font-semibold font-DMSans"
+                      className="h-[50px] w-full rounded-[4px] px-3 text-[#343434] text-[13px] font-semibold font-DMSans"
                       placeholder="Enter your phone number"
                       placeholderTextColor="#999"
                       keyboardType="number-pad"
@@ -374,9 +455,9 @@ const SignUp = () => {
                     Email (Optional)
                   </Text>
                   <View className="mt-2 border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
-                    <Image source={email} />
+                    <Image source={emailsvg} />
                     <TextInput
-                      className="h-[50px] w-full rounded-[4px] px-3 text-[#A9A9A9] text-[13px] font-semibold font-DMSans"
+                      className="h-[50px] w-full rounded-[4px] px-3 text-[#343434] text-[13px] font-semibold font-DMSans"
                       placeholder="Enter your email"
                       placeholderTextColor="#999"
                       onChangeText={(text) => handleInputChange(text, "email")}
@@ -404,7 +485,7 @@ const SignUp = () => {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                onPress={handleOtpPage}
+                onPress={handleFormsubmit}
                 className="h-[50px] w-[100%] bg-themeGreen rounded-[4px] flex justify-center items-center"
               >
                 <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
@@ -415,7 +496,16 @@ const SignUp = () => {
           </View>
         )}
       </ScrollView>
-      <CreatedModal isOpen={isModalOpen} closeModal={handleModalClose} />
+      <CreatedModal
+        userId={name}
+        isOpen={isModalOpen}
+        closeModal={handleModalClose}
+      />
+      <Accountexist
+        userId={message}
+        isOpen={isExistModalOpen}
+        closeModal={handleModalClose}
+      />
     </KeyboardAvoidingView>
   );
 };

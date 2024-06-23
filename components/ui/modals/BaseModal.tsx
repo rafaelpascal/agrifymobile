@@ -6,8 +6,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-interface IBaseModal {
-  children: React.ReactNode;
+interface IBaseModal extends IChildren, IModalPropsType {
   isOpen: boolean;
   closeModal: () => void;
 }

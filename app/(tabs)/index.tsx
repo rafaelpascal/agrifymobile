@@ -16,6 +16,14 @@ import { StatusBar } from "expo-status-bar";
 import { DashboardArea } from "../../components/ui/layout/dashboard/DashboardArea";
 import { DashboardCardRow } from "../../components/grouped-components/dashboard-card-row";
 import { DashboardCardProps } from "../../components/ui/dashboardCard/dashboardCard";
+import {
+  marchant_acc,
+  new_product,
+  all_product,
+  categories,
+  product_names,
+  get_previous_sales,
+} from "../../utils/apiService";
 import { CustomDropdown } from "../../components/ui/text-input/select-input";
 import { BaseItem } from "../../components/ui/product/listing";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
@@ -24,6 +32,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ProductCreated } from "../../components/ui/modals/ProductCreated";
+import { useUser } from "../../context/user-provider";
 const product = require("../../assets/images/product.png");
 const sales = require("../../assets/images/sales.png");
 const stock = require("../../assets/images/stock.png");
@@ -31,47 +40,76 @@ const plus = require("../../assets/images/plus.png");
 const back = require("../../assets/icon/goback.png");
 const dropdown = require("../../assets/icon/dropdown.png");
 
-const items = [
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Irish Potatoes",
-    qty: "5 baskets",
-    status: false,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Sweet Potatoes",
-    qty: "20 baskets",
-    status: true,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Yam",
-    qty: "3 baskets",
-    status: true,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Irish Potatoes",
-    qty: "5 baskets",
-    status: false,
-    value: 200,
-  },
-];
+interface Category {
+  createdAt: string;
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+interface ProductName {
+  createdAt: string;
+  id: string;
+  productname: string;
+  updatedAt: string;
+}
+
+type Item = {
+  icon: string;
+  title: string;
+  qty: number;
+  status: boolean;
+  value: number;
+  amount: number;
+};
+type ViewItem = {
+  icon: string;
+  title: string;
+  qty: number;
+  status: boolean;
+  value: number;
+  amount: number;
+};
+
+const defaultItem: ViewItem = {
+  icon: "",
+  title: "",
+  qty: 0,
+  status: false,
+  value: 0,
+  amount: 0,
+};
 
 export default function HomeScreen() {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const { user } = useUser();
+  const [items, setItems] = useState([
+    {
+      icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
+      title: "Irish Potatoes",
+      qty: "5 baskets",
+      status: false,
+      value: 200,
+    },
+    {
+      icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
+      title: "Sweet Potatoes",
+      qty: "20 baskets",
+      status: true,
+      value: 200,
+    },
+  ]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProduct, setIsNewProduct] = useState(false);
   const [iscameraActive, setisCameraActive] = useState(false);
   const [activeDropdownIndex, setActiveDropdownIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
+  const [iscategories, setCategories] = useState<Category[]>([]);
+  const [productname, setProductname] = useState<ProductName[]>([]);
   const [currentQty, setcurrentQty] = useState("");
   const [inputs, setInputs] = useState([{ quantity: "", price: "" }]);
   const [productName, setproductName] = useState("");
+  const [catId, setcatId] = useState("");
+  const [marchantName, setisMarchantName] = useState("");
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -100,6 +138,98 @@ export default function HomeScreen() {
       value: "0",
     },
   ]);
+
+  const currencyFormatter = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  //
+  useEffect(() => {
+    const getallproduct = async () => {
+      try {
+        const allproduct = await all_product();
+        const all_previous_sales = await get_previous_sales(user);
+        const previoussales = all_previous_sales?.completed_sales.rows;
+        const productCount = allproduct.data?.allproduct.count;
+        // Sum the currentQuantity of all products
+        const totalCurrentQuantity = allproduct.data?.allproduct.rows.reduce(
+          (sum: any, product: any) => {
+            return sum + (parseInt(product.currentQuantity) || 0);
+          },
+          0
+        );
+        const pptransformedData = previoussales.map((sales: any) => {
+          return {
+            amount: parseFloat(sales.amount),
+          };
+        });
+
+        const totalSalesAmount = pptransformedData.reduce(
+          (sum: number, sale: ViewItem) => sum + sale.amount,
+          0
+        );
+        const newamout = currencyFormatter.format(totalSalesAmount);
+        const updatedDashboardHeroCards = dashboardHeroCards.map((card) => {
+          if (card.title === "Total Product") {
+            return { ...card, value: productCount || 0 };
+          } else if (card.title === "Stock Left") {
+            return { ...card, value: totalCurrentQuantity || 0 };
+          } else if (card.title === "Total Sales") {
+            return { ...card, value: newamout || 0 };
+          }
+          return card;
+        });
+        setDashboardHeroCards(updatedDashboardHeroCards);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getallproduct();
+  }, []);
+
+  // get cates
+  useEffect(() => {
+    const allcategories = async () => {
+      try {
+        const allcate = await categories();
+        const cat = allcate.data?.allcat.rows;
+        setCategories(cat);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    allcategories();
+  }, []);
+
+  // Get names
+  useEffect(() => {
+    const category_names = async () => {
+      try {
+        const allname = await product_names(selectedValue);
+        const name = allname.data?.cate.rows;
+        setProductname(name);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    category_names();
+  }, [selectedValue]);
+
+  // Get marchant account
+  const marchant = async () => {
+    try {
+      const acc = await marchant_acc(user);
+      setisMarchantName(acc.data.user.lastName);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    marchant();
+  }, [user]);
 
   const handleInputChange = (
     index: number | any,
@@ -178,7 +308,32 @@ export default function HomeScreen() {
     setIsModalOpen(false);
   };
 
-  const lastInput = inputs[inputs.length - 1];
+  const handleFormsubmit = async () => {
+    try {
+      // Constructing the object with form inputs
+      const formData = {
+        category: selectedValue,
+        productName: productName,
+        pricing: inputs,
+        currentQuantity: currentQty,
+        images: capturedImages,
+      };
+      const res = await new_product(formData);
+      if (res) {
+        setIsModalOpen(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleContinue = () => {
+    setIsNewProduct(false);
+  };
+
+  const options = iscategories.map((category) => category.name);
+  const pname = productname.map((name) => name.productname);
+
   return (
     <>
       <StatusBar style="auto" hidden={true} />
@@ -186,7 +341,7 @@ export default function HomeScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <DashboardArea title={`Welcome Raphael`}>
+        <DashboardArea title={`Welcome ${marchantName}`}>
           {isNewProduct ? (
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -316,21 +471,26 @@ export default function HomeScreen() {
                           Cancel
                         </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity className="h-[50px] w-[49%] bg-themeGreen rounded-[4px] flex justify-center items-center">
+                      <TouchableOpacity
+                        onPress={handleFormsubmit}
+                        className="h-[50px] w-[49%] bg-themeGreen rounded-[4px] flex justify-center items-center"
+                      >
                         <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
                           Done
                         </Text>
                       </TouchableOpacity>
                     </View>
                     <ProductCreated
+                      userId=""
                       isOpen={isModalOpen}
+                      handleContinue={handleContinue}
                       closeModal={handleModalClose}
                     />
                   </View>
                 ) : (
-                  <>
+                  <View className="w-full">
                     {iscameraActive ? (
-                      <View className="w-full h-full pb-[30%]">
+                      <View className="w-full h-full">
                         <TouchableOpacity
                           onPress={() => setisCameraActive(false)}
                           className="bg-themeGreen/10 w-[78px] h-[35px] flex justify-center items-center flex-row rounded-md"
@@ -350,141 +510,39 @@ export default function HomeScreen() {
                             </Text>
                           </View>
                         </View>
-                        <View className="h-auto w-full">
-                          <View className="pb-[10%] h-full">
-                            <View className="w-full h-full">
-                              {isFirstcapture ? (
-                                <View className="flex flex-col w-full h-[400px]">
-                                  <>
-                                    {isNewpicture &&
-                                    capturedImages.length > 0 ? (
-                                      <View className="w-full">
-                                        {isViewImage ? (
-                                          <View>
-                                            <ImageBackground
-                                              source={{ uri: selectedImage }}
-                                              className="w-full h-[400px] rounded-lg overflow-hidden relative z-0"
-                                            >
-                                              <TouchableOpacity
-                                                onPress={closeImageView}
-                                                className="absolute right-0"
+                        {/* ********* */}
+                        <ScrollView
+                          contentContainerStyle={styles.scrollView}
+                          showsVerticalScrollIndicator={false}
+                        >
+                          <View className="h-[100vh] w-full">
+                            <View className="pb-5">
+                              <View className="w-full relative h-full">
+                                {isFirstcapture ? (
+                                  <View className="flex flex-col w-full h-[400px]">
+                                    <>
+                                      {isNewpicture &&
+                                      capturedImages.length > 0 ? (
+                                        <View className="w-full h-full">
+                                          {isViewImage ? (
+                                            <View>
+                                              <ImageBackground
+                                                source={{ uri: selectedImage }}
+                                                className="w-full h-[400px] rounded-lg overflow-hidden relative z-0"
                                               >
-                                                <MaterialIcons
-                                                  name="highlight-remove"
-                                                  size={24}
-                                                  color="white"
-                                                />
-                                              </TouchableOpacity>
-                                            </ImageBackground>
-                                          </View>
-                                        ) : (
-                                          <CameraView
-                                            className="h-[400px]"
-                                            facing={facing}
-                                            ref={cameraRef}
-                                          >
-                                            <View className="relative h-full">
-                                              <TouchableOpacity
-                                                className="absolute right-4 top-2"
-                                                onPress={toggleCameraFacing}
-                                              >
-                                                <MaterialIcons
-                                                  name="flip-camera-ios"
-                                                  size={44}
-                                                  color="white"
-                                                />
-                                              </TouchableOpacity>
-                                              <TouchableOpacity
-                                                className="absolute bottom-0 left-[40%]"
-                                                onPress={captureImage}
-                                              >
-                                                <MaterialCommunityIcons
-                                                  name="camera-iris"
-                                                  size={54}
-                                                  color="white"
-                                                />
-                                              </TouchableOpacity>
-                                            </View>
-                                          </CameraView>
-                                        )}
-                                        <View className="flex flex-row rounded-lg justify-start items-center mt-4">
-                                          {capturedImages.map(
-                                            (image, index) => (
-                                              <TouchableOpacity
-                                                key={index}
-                                                onPress={() =>
-                                                  handleImageClick(image)
-                                                }
-                                              >
-                                                <ImageBackground
-                                                  key={index}
-                                                  source={{ uri: image }}
-                                                  className="w-[60px] h-[60px] ml-2 rounded-lg overflow-hidden relative z-0"
+                                                <TouchableOpacity
+                                                  onPress={closeImageView}
+                                                  className="absolute right-0"
                                                 >
-                                                  <TouchableOpacity
-                                                    onPress={() =>
-                                                      handleImageRemove(index)
-                                                    }
-                                                    className="absolute right-0"
-                                                  >
-                                                    <MaterialIcons
-                                                      name="highlight-remove"
-                                                      size={24}
-                                                      color="white"
-                                                    />
-                                                  </TouchableOpacity>
-                                                </ImageBackground>
-                                              </TouchableOpacity>
-                                            )
-                                          )}
-                                        </View>
-                                      </View>
-                                    ) : (
-                                      <>
-                                        {capturedImages.length > 0 ? (
-                                          <View className="flex flex-col w-full rounded-lg justify-center items-center">
-                                            <View className="relative rounded-lg w-full h-full pt-8">
-                                              {capturedImages.map(
-                                                (image, index) => (
-                                                  <ImageBackground
-                                                    key={index}
-                                                    source={{ uri: image }}
-                                                    className="w-full h-full rounded-lg z-0 overflow-hidden "
-                                                  >
-                                                    <TouchableOpacity
-                                                      onPress={() =>
-                                                        handleImageRemove(index)
-                                                      }
-                                                      className="absolute right-2 top-2 z-20"
-                                                    >
-                                                      <MaterialIcons
-                                                        name="cancel"
-                                                        size={34}
-                                                        color="white"
-                                                      />
-                                                    </TouchableOpacity>
-                                                  </ImageBackground>
-                                                )
-                                              )}
+                                                  <MaterialIcons
+                                                    name="highlight-remove"
+                                                    size={24}
+                                                    color="white"
+                                                  />
+                                                </TouchableOpacity>
+                                              </ImageBackground>
                                             </View>
-                                            <TouchableOpacity
-                                              className="w-full h-[44px] border-[1px] border-dashed border-[#6D9EFF] rounded-[4px] flex justify-center items-center flex-row mt-4"
-                                              onPress={() =>
-                                                setisNewpicture(true)
-                                              }
-                                            >
-                                              <FontAwesome6
-                                                name="plus"
-                                                size={24}
-                                                color="#6D9EFF"
-                                              />
-                                              <Text className="text-[14px] text-[#6D9EFF] ml-2 font-DMSans font-bold">
-                                                Add another image
-                                              </Text>
-                                            </TouchableOpacity>
-                                          </View>
-                                        ) : (
-                                          <View className="flex flex-1 justify-center">
+                                          ) : (
                                             <CameraView
                                               className="h-[400px]"
                                               facing={facing}
@@ -513,48 +571,160 @@ export default function HomeScreen() {
                                                 </TouchableOpacity>
                                               </View>
                                             </CameraView>
+                                          )}
+                                          <View className="flex flex-row rounded-lg justify-start items-center mt-4">
+                                            {capturedImages.map(
+                                              (image, index) => (
+                                                <TouchableOpacity
+                                                  key={index}
+                                                  onPress={() =>
+                                                    handleImageClick(image)
+                                                  }
+                                                >
+                                                  <ImageBackground
+                                                    key={index}
+                                                    source={{ uri: image }}
+                                                    className="w-[60px] h-[60px] ml-2 rounded-lg overflow-hidden relative z-0"
+                                                  >
+                                                    <TouchableOpacity
+                                                      onPress={() =>
+                                                        handleImageRemove(index)
+                                                      }
+                                                      className="absolute right-0"
+                                                    >
+                                                      <MaterialIcons
+                                                        name="highlight-remove"
+                                                        size={24}
+                                                        color="white"
+                                                      />
+                                                    </TouchableOpacity>
+                                                  </ImageBackground>
+                                                </TouchableOpacity>
+                                              )
+                                            )}
                                           </View>
-                                        )}
-                                      </>
-                                    )}
-                                  </>
-                                </View>
-                              ) : (
-                                <View>
-                                  <TouchableOpacity
-                                    className="w-full h-[69px] bg-[#6D9EFF]/10 rounded-[4px] flex justify-center items-center flex-row"
-                                    onPress={() => setFirstCapture(true)}
-                                  >
-                                    <MaterialIcons
-                                      name="photo-camera"
-                                      size={30}
-                                      color="#6D9EFF"
-                                    />
-                                    <Text className="text-[13px] text-[#6D9EFF] ml-1 font-DMSans font-bold">
-                                      Take a photo or Upload
+                                        </View>
+                                      ) : (
+                                        <>
+                                          {capturedImages.length > 0 ? (
+                                            <View className="flex flex-col w-full rounded-lg justify-center items-center">
+                                              <View className="relative rounded-lg w-full h-full pt-8">
+                                                {capturedImages.map(
+                                                  (image, index) => (
+                                                    <ImageBackground
+                                                      key={index}
+                                                      source={{ uri: image }}
+                                                      className="w-full h-full rounded-lg z-0 overflow-hidden "
+                                                    >
+                                                      <TouchableOpacity
+                                                        onPress={() =>
+                                                          handleImageRemove(
+                                                            index
+                                                          )
+                                                        }
+                                                        className="absolute right-2 top-2 z-20"
+                                                      >
+                                                        <MaterialIcons
+                                                          name="cancel"
+                                                          size={34}
+                                                          color="white"
+                                                        />
+                                                      </TouchableOpacity>
+                                                    </ImageBackground>
+                                                  )
+                                                )}
+                                              </View>
+                                              <TouchableOpacity
+                                                className="w-full h-[44px] border-[1px] border-dashed border-[#6D9EFF] rounded-[4px] flex justify-center items-center flex-row mt-4"
+                                                onPress={() =>
+                                                  setisNewpicture(true)
+                                                }
+                                              >
+                                                <FontAwesome6
+                                                  name="plus"
+                                                  size={24}
+                                                  color="#6D9EFF"
+                                                />
+                                                <Text className="text-[14px] text-[#6D9EFF] ml-2 font-DMSans font-bold">
+                                                  Add another image
+                                                </Text>
+                                              </TouchableOpacity>
+                                            </View>
+                                          ) : (
+                                            <View className="flex flex-1 justify-center">
+                                              <CameraView
+                                                className="h-[400px]"
+                                                facing={facing}
+                                                ref={cameraRef}
+                                              >
+                                                <View className="relative h-full">
+                                                  <TouchableOpacity
+                                                    className="absolute right-4 top-2"
+                                                    onPress={toggleCameraFacing}
+                                                  >
+                                                    <MaterialIcons
+                                                      name="flip-camera-ios"
+                                                      size={44}
+                                                      color="white"
+                                                    />
+                                                  </TouchableOpacity>
+                                                  <TouchableOpacity
+                                                    className="absolute bottom-0 left-[40%]"
+                                                    onPress={captureImage}
+                                                  >
+                                                    <MaterialCommunityIcons
+                                                      name="camera-iris"
+                                                      size={54}
+                                                      color="white"
+                                                    />
+                                                  </TouchableOpacity>
+                                                </View>
+                                              </CameraView>
+                                            </View>
+                                          )}
+                                        </>
+                                      )}
+                                    </>
+                                  </View>
+                                ) : (
+                                  <View>
+                                    <TouchableOpacity
+                                      className="w-full h-[69px] bg-[#6D9EFF]/10 rounded-[4px] flex justify-center items-center flex-row"
+                                      onPress={() => setFirstCapture(true)}
+                                    >
+                                      <MaterialIcons
+                                        name="photo-camera"
+                                        size={30}
+                                        color="#6D9EFF"
+                                      />
+                                      <Text className="text-[13px] text-[#6D9EFF] ml-1 font-DMSans font-bold">
+                                        Take a photo or Upload
+                                      </Text>
+                                    </TouchableOpacity>
+                                  </View>
+                                )}
+                              </View>
+                              <View className="absolute bottom-0 w-full">
+                                {capturedImages.length === 0 ? (
+                                  <TouchableOpacity className="h-[50px] w-[100%] bg-[#E2E2E2] rounded-[4px] flex justify-center items-center">
+                                    <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
+                                      Save
                                     </Text>
                                   </TouchableOpacity>
-                                </View>
-                              )}
+                                ) : (
+                                  <TouchableOpacity
+                                    onPress={handlePreviewPage}
+                                    className="h-[50px] w-[100%] bg-themeGreen rounded-[4px] flex justify-center items-center"
+                                  >
+                                    <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
+                                      Save
+                                    </Text>
+                                  </TouchableOpacity>
+                                )}
+                              </View>
                             </View>
-                            {capturedImages.length === 0 ? (
-                              <TouchableOpacity className="h-[50px] w-[100%] bg-[#E2E2E2] rounded-[4px] flex justify-center items-center">
-                                <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
-                                  Save
-                                </Text>
-                              </TouchableOpacity>
-                            ) : (
-                              <TouchableOpacity
-                                onPress={handlePreviewPage}
-                                className="h-[50px] w-[100%] bg-themeGreen rounded-[4px] flex justify-center items-center"
-                              >
-                                <Text className=" text-left text-[16px] font-bold font-DMSans text-[#fff]">
-                                  Save
-                                </Text>
-                              </TouchableOpacity>
-                            )}
                           </View>
-                        </View>
+                        </ScrollView>
                       </View>
                     ) : (
                       <View>
@@ -587,14 +757,7 @@ export default function HomeScreen() {
                             }`}
                           >
                             <CustomDropdown
-                              options={[
-                                "Tubers",
-                                "Grains",
-                                "Fruits",
-                                "Livestock",
-                                "Egg",
-                                "Vegetables",
-                              ]}
+                              options={options}
                               placeholder="Select a Category"
                               InputClass="top-[36%]"
                               selectedValue={selectedValue}
@@ -620,14 +783,7 @@ export default function HomeScreen() {
                               }`}
                             >
                               <CustomDropdown
-                                options={[
-                                  "Yam",
-                                  "Cassava",
-                                  "Rice",
-                                  "Sweet Potatoes",
-                                  "Irish potatoes",
-                                  "Ugu",
-                                ]}
+                                options={pname}
                                 placeholder="Select your product"
                                 InputClass="top-[47%]"
                                 selectedValue={productName}
@@ -759,7 +915,7 @@ export default function HomeScreen() {
                         )}
                       </View>
                     )}
-                  </>
+                  </View>
                 )}
               </ScrollView>
             </KeyboardAvoidingView>

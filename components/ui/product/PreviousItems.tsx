@@ -1,15 +1,9 @@
-import {
-  View,
-  Image,
-  ImageSourcePropType,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { View, Image, Text, TouchableOpacity } from "react-native";
 
 export interface DashboardCardProps {
   icon: string;
   title: string;
-  qty: string;
+  qty: number;
   status: boolean;
   value: number;
   list: string;
@@ -18,9 +12,18 @@ export interface DashboardCardProps {
 
 export const PreviousItems = (props: DashboardCardProps) => {
   const { icon, qty, status, title, value, list, onItemPressed } = props;
+
+  const currencyFormatter = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  const newVal = currencyFormatter.format(value);
   return (
     <View className="w-full border-[2px] flex flex-row justify-between items-center border-[#E6E6E8] h-[74px] my-[4px] rounded-[8px] px-[10px] py-3">
-      <View className="flex flex-row justify-start items-end">
+      <View className="flex flex-row justify-start items-center">
         {icon ? (
           <Image
             source={{ uri: icon }}
@@ -38,12 +41,12 @@ export const PreviousItems = (props: DashboardCardProps) => {
               </Text>
             )}
             <Text className="font-DMSans font-normal text-[#8F94A8] text-[13px]">
-              {qty}
+              {qty} baskets
             </Text>
           </View>
           <View className="flex flex-row justify-start items-center">
             <Text className="mr-2 font-DMSans font-normal text-[#8F94A8] text-[13px]">
-              {value}
+              {newVal}
             </Text>
             {status === true ? (
               <View className="flex justify-center items-start rounded-[4px] bg-themeGreen/10">
