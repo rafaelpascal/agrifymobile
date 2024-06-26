@@ -45,10 +45,6 @@ export const Avatar = (props: AvatarProps) => {
           imageStyle={rounded && styles.roundedImage}
         />
       )}
-      <View>
-        <Text className="font-bold text-[16px]">{name}</Text>
-        {children}
-      </View>
     </View>
   );
 };

@@ -8,7 +8,9 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { MaterialIcons } from "@expo/vector-icons";
-const productImage = require("../../../assets/images/productimg.png");
+import { get_order } from "../../../utils/apiService";
+import { useEffect, useState } from "react";
+// const productImage = require("../../../assets/images/productimg.png");
 
 type RootStackParamList = {
   "(tabs)": NavigatorScreenParams<TabParamList>;
@@ -34,9 +36,25 @@ interface IModalPropsType {
   status: boolean;
 }
 
-interface ProductDetailsModalType {
+type ViewItem = {
+  id: string;
+  icon: string;
+  title: string;
+  qty: number;
   status: boolean;
-}
+  value: number;
+  amount: number;
+};
+
+const defaultItem: ViewItem = {
+  id: "",
+  icon: "",
+  title: "",
+  qty: 0,
+  status: false,
+  value: 0,
+  amount: 0,
+};
 
 export const ProductDetails = ({
   userId,
@@ -44,6 +62,32 @@ export const ProductDetails = ({
   closeModal,
   status,
 }: IModalPropsType) => {
+  const [catgory, setCategories] = useState("");
+  const [productImage, setproductImage] = useState("");
+  const [productName, seproductName] = useState("");
+  const [gtySold, setgtySold] = useState("");
+  const [price, setPrice] = useState("");
+  const [dateSold, setdateSold] = useState("");
+  const [isstatus, setStatus] = useState(false);
+
+  useEffect(() => {
+    const getOrder = async () => {
+      try {
+        const order = await get_order(userId);
+        setproductImage(order.completed_sales.product.images[0].imageUrl);
+        setCategories(order.completed_sales.product.category);
+        seproductName(order.completed_sales.product.productName);
+        setgtySold(order.completed_sales.qty);
+        setPrice(order.completed_sales.amount);
+        setdateSold(order.completed_sales.updatedAt.split("T")[0]); //ADD DATE SOLD AND REPLACE
+        setStatus(order.completed_sales.status);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getOrder();
+  }, [userId]);
+
   return (
     <BaseModal userId={userId} isOpen={isOpen} closeModal={closeModal}>
       <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[12px] flex justify-between items-center w-full">
@@ -55,16 +99,27 @@ export const ProductDetails = ({
         </TouchableOpacity>
       </View>
       <View className="flex bg-themeWhite w-full p-[28px] items-start justify-start">
-        <View className="flex flex-row justify-start items-start gap-2">
-          <Image source={productImage} className="rounded-lg" />
-          <Image source={productImage} className="rounded-lg" />
+        <View className="flex flex-row justify-start items-start">
+          {productImage ? (
+            <View>
+              <Image
+                source={{ uri: productImage }}
+                className="rounded-lg mb-3"
+                style={{ width: 50, height: 50 }}
+              />
+            </View>
+          ) : (
+            <View>
+              <Text>Loading...</Text>
+            </View>
+          )}
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
           <Text className="text-center text-[16px] font-DMSans font-normal">
             Product Category:
           </Text>
           <Text className="text-center text-[16px]  font-DMSans font-bold text-[#25313E]">
-            Tubers
+            {catgory}
           </Text>
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -72,7 +127,7 @@ export const ProductDetails = ({
             Product Name:
           </Text>
           <Text className="text-center text-[16px] font-DMSans font-bold text-[#25313E]">
-            Cassava
+            {productName}
           </Text>
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -80,7 +135,7 @@ export const ProductDetails = ({
             Quantity Sold:
           </Text>
           <Text className="text-center text-[16px]  font-DMSans font-bold text-[#25313E]">
-            3 baskets
+            {gtySold} baskets
           </Text>
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -88,7 +143,7 @@ export const ProductDetails = ({
             Price:
           </Text>
           <Text className="text-center text-[16px]  font-DMSans font-bold text-[#25313E]">
-            ₦18,700
+            {price}
           </Text>
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -96,14 +151,14 @@ export const ProductDetails = ({
             Date sold:
           </Text>
           <Text className="text-center text-[16px]  font-DMSans font-bold text-[#25313E]">
-            25/04/2024
+            {dateSold}
           </Text>
         </View>
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
           <Text className="text-center text-[16px] font-DMSans font-normal">
             Status:
           </Text>
-          {status === true ? (
+          {isstatus === true ? (
             <View className="bg-themeGreen/10  rounded-[4px] px-2 py-1">
               <Text className="text-center text-[16px]  font-DMSans font-bold text-themeGreen">
                 Sold

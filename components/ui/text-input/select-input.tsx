@@ -62,12 +62,13 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         animationType="fade"
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
+        className={InputClass}
       >
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
           <View className="w-full h-full flex relative transition-[.5s] flex-1 justify-center items-center">
             <TouchableWithoutFeedback onPress={() => {}}>
               <View
-                className={`w-[315px] h-[276px] bg-white px-4 py-2 overflow-y-scroll absolute rounded-lg shadow-lg ${InputClass}`}
+                className={`w-[315px] h-[276px] bg-white px-4 py-2 overflow-y-scroll rounded-lg shadow-lg ${InputClass}`}
               >
                 <View className="h-[32px] relative px-2 flex flex-row justify-between items-center w-full rounded-[4px] border-[1px] border-[#CCD0DC]">
                   <TextInput

@@ -1,6 +1,7 @@
 import { View, Image, Text, TouchableOpacity } from "react-native";
 
 export interface DashboardCardProps {
+  id: string;
   icon: string;
   title: string;
   qty: number;
@@ -35,7 +36,7 @@ export const PreviousItems = (props: DashboardCardProps) => {
         <View className="flex ml-2 flex-col justify-center items-start">
           <Text className="text-[14px] font-bold font-DMSans ">{title}</Text>
           <View className="flex flex-row justify-center items-center">
-            {list === "previous" && (
+            {list === "pending" && (
               <Text className="font-DMSans font-normal text-[#CE4500] text-[13px]">
                 Request:
               </Text>

@@ -9,7 +9,7 @@ const sales = require("../../assets/navigations/sales.png");
 const shopFocused = require("../../assets/navigations/shop.png");
 const shop = require("../../assets/navigations/shop1.png");
 const settingFocused = require("../../assets/navigations/settingfocused.png");
-const setting = require("../../assets/navigations/setting.png");
+const settingsvg = require("../../assets/navigations/setting.png");
 import { Image } from "react-native";
 
 export default function TabLayout() {
@@ -60,11 +60,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="psettings"
+        name="personalsettings"
         options={{
           title: "Settings",
           tabBarIcon: ({ color, focused }) => (
-            <Image source={focused ? settingFocused : setting} />
+            <Image source={focused ? settingFocused : settingsvg} />
           ),
           tabBarLabelStyle: {
             fontSize: 14,

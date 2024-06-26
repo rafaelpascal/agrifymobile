@@ -163,3 +163,71 @@ export const get_previous_sales = async (marchantId: string) => {
     throw error;
   }
 };
+
+// Marchant get product names
+export const get_pending_order = async (marchantId: string) => {
+  try {
+    const response = await axios.get(
+      `${StringapiUrl}/api/marchant_order/get_pending_order/${marchantId}`,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Marchant get all order
+export const get_all_order = async (marchantId: string) => {
+  try {
+    const response = await axios.get(
+      `${StringapiUrl}/api/marchant_order/get_all_order/${marchantId}`,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Marchant get an order
+export const get_order = async (orderId: string | undefined) => {
+  try {
+    const response = await axios.get(
+      `${StringapiUrl}/api/marchant_order/get_order/${orderId}`,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// get Marchant get using device Id
+export const get_deviceId = async (deviceId: string | undefined) => {
+  try {
+    const response = await axios.get(
+      `${StringapiUrl}/api/auth/checkdevice/${deviceId}`,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

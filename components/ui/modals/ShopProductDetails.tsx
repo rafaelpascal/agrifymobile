@@ -29,6 +29,8 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 interface Item {
+  category: string;
+  dateAdded: string;
   icon: string;
   title: string;
   qty: number;
@@ -55,6 +57,15 @@ export const ShopProductDetails = ({
   closeModal,
   status,
 }: IModalPropsType) => {
+  const currencyFormatter = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  const price = currencyFormatter.format(itemp.value);
+
   return (
     <BaseModal userId={userId} isOpen={isOpen} closeModal={closeModal}>
       <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[12px] flex justify-between items-center w-full">
@@ -79,7 +90,7 @@ export const ShopProductDetails = ({
               Product Category:
             </Text>
             <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
-              Tubers
+              {itemp.category}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
@@ -119,15 +130,15 @@ export const ShopProductDetails = ({
               Price:
             </Text>
             <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
-              ₦{itemp.value}
+              {price}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
             <Text className="text-center text-[12px] font-DMSans font-normal">
-              Date sold:
+              Date Added:
             </Text>
             <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
-              25/04/2024
+              {itemp.dateAdded}
             </Text>
           </View>
         </View>

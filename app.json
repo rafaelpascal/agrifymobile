@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "scheme": "agrifymobile",
     "backgroundColor": "#ffffff",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icon/agrifyLogodark.png",
     "extra": {
       "apiUrl": "http://192.168.0.176:5000",
       "apiKey": "f7e67652e182943da776fb8c7ade8701acb0a97903101227254a692921a4"
@@ -14,7 +14,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#00A45F"
     },
     "ios": {
       "supportsTablet": true,
@@ -25,7 +25,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/icon/agrifyLogodark.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [

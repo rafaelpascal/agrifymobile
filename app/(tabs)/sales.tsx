@@ -15,8 +15,9 @@ import { PreviousItems } from "../../components/ui/product/PreviousItems";
 import Feather from "@expo/vector-icons/Feather";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useUser } from "../../context/user-provider";
-import { get_previous_sales } from "../../utils/apiService";
+import { get_previous_sales, get_pending_order } from "../../utils/apiService";
 import { ProductDetails } from "../../components/ui/modals/ProductDetails";
+import DropDownPicker from "react-native-dropdown-picker";
 const order = require("../../assets/images/pendingOrder.png");
 const sales = require("../../assets/images/sales.png");
 
@@ -28,6 +29,8 @@ type Item = {
   value: number;
 };
 type ViewItem = {
+  category: string;
+  id: string;
   icon: string;
   title: string;
   qty: number;
@@ -37,6 +40,8 @@ type ViewItem = {
 };
 
 const defaultItem: ViewItem = {
+  category: "",
+  id: "",
   icon: "",
   title: "",
   qty: 0,
@@ -45,37 +50,106 @@ const defaultItem: ViewItem = {
   amount: 0,
 };
 
-const pendings = [
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Irish Potatoes",
-    qty: 5,
-    status: false,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Sweet Potatoes",
-    qty: 22,
-    status: true,
-    value: 200,
-  },
-  {
-    icon: "https://s3-alpha-sig.figma.com/img/ee10/564d/aad91c59eeb694d3acc38b2e444d7534?Expires=1718582400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YvyE1E1zbhxrJcOlMGTHITRdV1hlG8miWl8MadYNVdKzia6PgsTLdu9E20ygyIoFL6SZqFKge1YghU4RCwEII7UavnnaldJ5ozG0cl2NfL6ba5sczziGhnsPcMOOe4KgBhlQalFDnlh36XsxG9e8bSiMEq8EfwDQd56KTkoQjr5QSxm0SsWR-PNesNg~XboyEw30tvIZ4Bc1SwN~kg1Ih969bEMR-CEnfCS5IjF3rkPeJq0HefYyIVGR3Oc8kcFVG6GGa5VXRN2wcSozqFt6AWQnTEYyzy-~HA3vTMOiDGDmka08nTCAHO0h5KbYK1WkRJdwCf~~h3FkqSjxHCwl-Q__",
-    title: "Yam",
-    qty: 45,
-    status: true,
-    value: 200,
-  },
-];
-
 export default function Sales() {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previousItem, setpreviousItem] = useState([defaultItem]);
+  const [pendings, setpendings] = useState([defaultItem]);
   const [previousTotal, setPreviousTotal] = useState<string>("0");
+  const [pendingTotal, setPendingTotal] = useState<string>("0");
+  const [orderId, setOrderId] = useState<string>("0");
   const [isprevioussales, setPrevioussales] = useState(true);
   const [ispendingOrder, setPendingOrder] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pendingsearchQuery, setpendingSearchQuery] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState("");
+  const [penfilterCriteria, setpenFilterCriteria] = useState("");
+  const [filteredItems, setFilteredItems] = useState(previousItem);
+  const [penfilteredItems, setPenFilteredItems] = useState(pendings);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string>("");
+  const [penvalue, setPenValue] = useState<string>("");
+  const [items, setItems] = useState([
+    { label: "Filter", value: "" },
+    { label: "Tuber Crop", value: "Tuber Crop" },
+    { label: "Grain Crop", value: "Grain Crop" },
+  ]);
+
+  const nsetFilterCriteria = (newValue: string | null) => {
+    if (newValue !== null) {
+      setValue(newValue);
+    }
+  };
+
+  const pendingsetFilterCriteria = (newValue: string | null) => {
+    if (newValue !== null) {
+      setPenValue(newValue);
+    }
+  };
+
+  useEffect(() => {
+    const filtered = previousItem.filter((item) => {
+      const matchesSearchQuery = item.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      const matchesFilterCriteria = filterCriteria
+        ? item.title === filterCriteria
+        : true;
+
+      return matchesSearchQuery && matchesFilterCriteria;
+    });
+
+    setFilteredItems(filtered);
+  }, [searchQuery, filterCriteria, previousItem]);
+
+  useEffect(() => {
+    const filtered = previousItem.filter((item) => {
+      const matchesSearchQuery = item.category
+        .toLowerCase()
+        .includes(value.toLowerCase());
+
+      const matchesFilterCriteria = filterCriteria
+        ? item.title === filterCriteria
+        : true;
+
+      return matchesSearchQuery && matchesFilterCriteria;
+    });
+
+    setFilteredItems(filtered);
+  }, [value, filterCriteria, previousItem]);
+
+  useEffect(() => {
+    const filtered = pendings.filter((item) => {
+      const matchesSearchQuery = item.title
+        .toLowerCase()
+        .includes(pendingsearchQuery.toLowerCase());
+
+      const matchesFilterCriteria = penfilterCriteria
+        ? item.title === penfilterCriteria
+        : true;
+
+      return matchesSearchQuery && matchesFilterCriteria;
+    });
+
+    setPenFilteredItems(filtered);
+  }, [pendingsearchQuery, penfilterCriteria, pendings]);
+
+  useEffect(() => {
+    const filtered = pendings.filter((item) => {
+      const matchesSearchQuery = item.category
+        .toLowerCase()
+        .includes(penvalue.toLowerCase());
+
+      const matchesFilterCriteria = penfilterCriteria
+        ? item.title === penfilterCriteria
+        : true;
+
+      return matchesSearchQuery && matchesFilterCriteria;
+    });
+
+    setPenFilteredItems(filtered);
+  }, [penvalue, penfilterCriteria, pendings]);
 
   const handlePreviousSales = () => {
     setPendingOrder(false);
@@ -92,8 +166,10 @@ export default function Sales() {
   };
 
   const handleItemPressed = (item: any) => {
+    setOrderId(item);
     setIsModalOpen(true);
   };
+  //
   const currencyFormatter = new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
@@ -110,7 +186,9 @@ export default function Sales() {
         const transformedData = previoussales.map((sales: any) => {
           const firstImage = sales.product.images[0];
           return {
+            id: sales.id,
             icon: firstImage.imageUrl,
+            category: sales.product.category,
             title: sales.product.productName,
             qty: `${sales.qty}`,
             status: sales.status || false,
@@ -132,6 +210,39 @@ export default function Sales() {
       }
     };
     getprevioussales();
+  }, [user]);
+
+  useEffect(() => {
+    const getpendingorder = async () => {
+      try {
+        const all_pending_sales = await get_pending_order(user);
+        const pendingorder = all_pending_sales?.completed_sales.rows;
+        const transformedData = pendingorder.map((sales: any) => {
+          const firstImage = sales.product.images[0];
+          return {
+            id: sales.id,
+            icon: firstImage.imageUrl,
+            category: sales.product.category,
+            title: sales.product.productName,
+            qty: `${sales.qty}`,
+            status: sales.status || false,
+            value: sales.amount,
+            amount: parseFloat(sales.amount),
+          };
+        });
+
+        const totalSalesAmount = transformedData.reduce(
+          (sum: number, sale: ViewItem) => sum + sale.amount,
+          0
+        );
+        const newamout = currencyFormatter.format(totalSalesAmount);
+        setPendingTotal(newamout);
+        setpendings(transformedData);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getpendingorder();
   }, []);
 
   return (
@@ -167,7 +278,7 @@ export default function Sales() {
                 </Text>
               </View>
               <Text className="w-full text-[16px] font-bold font-DMSans text-[#435060]">
-                ₦25,000
+                {pendingTotal}
               </Text>
             </View>
           </View>
@@ -187,7 +298,7 @@ export default function Sales() {
                     : "text-[14px] font-semibold font-DMSans text-[#AFAEBC]"
                 }`}
               >
-                Your Previous Sales
+                Your previous Sales
               </Text>
             </TouchableOpacity>
             {/* Taps */}
@@ -206,30 +317,110 @@ export default function Sales() {
                     : "text-[14px] font-semibold font-DMSans text-[#AFAEBC]"
                 }`}
               >
-                Your Previous Sales
+                Your pending order
               </Text>
             </TouchableOpacity>
           </View>
-          <View className="my-2 flex flex-row justify-between items-center">
-            <View className="w-[228px] flex-row px-4 flex justify-start items-center h-[36px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
-              <Feather name="search" size={20} color="black" />
-              <TextInput
-                placeholder="Search"
-                className="w-full h-full rounded-[8px] ml-2"
-                placeholderTextColor="#435060"
-              ></TextInput>
+          {isprevioussales && (
+            <View className="my-2 flex flex-row justify-between items-center z-10">
+              <View className="w-[60%] flex-row px-4 flex justify-start items-center h-[36px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
+                <Feather name="search" size={20} color="black" />
+                <TextInput
+                  placeholder="Search..."
+                  className="w-full h-full rounded-[8px] ml-2"
+                  placeholderTextColor="#435060"
+                  value={searchQuery}
+                  onChangeText={(text) => setSearchQuery(text)}
+                ></TextInput>
+              </View>
+
+              <View className="w-[40%] mt-3 flex-row px-2 flex justify-between items-center h-[36px] bg-[#FFFFFF] rounded-[8px]">
+                <DropDownPicker
+                  open={open}
+                  value={value}
+                  items={items}
+                  autoScroll={true}
+                  zIndex={1000}
+                  setOpen={setOpen}
+                  setValue={setValue}
+                  setItems={setItems}
+                  onChangeValue={(newValue) => nsetFilterCriteria(newValue)} // Ensure the correct setFilterCriteria function is used
+                  placeholder="Filter"
+                  style={{
+                    width: "100%", // Set width to 100% to fill the parent container
+                    borderColor: "#E6E6E8",
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: 8,
+                    zIndex: 1,
+                  }}
+                  dropDownContainerStyle={{
+                    borderColor: "#E6E6E8",
+                    borderRadius: 8,
+                    width: "100%",
+                    backgroundColor: "#FFFFFF",
+                  }}
+                  placeholderStyle={{
+                    color: "#435060",
+                  }}
+                  ArrowDownIconComponent={({ style }) => (
+                    <AntDesign name="caretdown" size={14} color="black" />
+                  )}
+                />
+              </View>
             </View>
-            <View className="w-[112px] flex-row px-4 flex justify-between items-center h-[36px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
-              <TextInput
-                placeholder="Filter"
-                className="w-auto h-full rounded-[8px]"
-                placeholderTextColor="#435060"
-              ></TextInput>
-              <AntDesign name="caretdown" size={14} color="black" />
+          )}
+          {ispendingOrder && (
+            <View className="my-2 flex flex-row justify-between items-center z-10">
+              <View className="w-[60%] flex-row px-4 flex justify-start items-center h-[36px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
+                <Feather name="search" size={20} color="black" />
+                <TextInput
+                  placeholder="Search..."
+                  className="w-full h-full rounded-[8px] ml-2"
+                  placeholderTextColor="#435060"
+                  value={pendingsearchQuery}
+                  onChangeText={(text) => setpendingSearchQuery(text)}
+                ></TextInput>
+              </View>
+
+              <View className="w-[40%] mt-3 flex-row px-2 flex justify-between items-center h-[36px] bg-[#FFFFFF] rounded-[8px]">
+                <DropDownPicker
+                  open={open}
+                  value={penvalue}
+                  items={items}
+                  autoScroll={true}
+                  zIndex={1000}
+                  setOpen={setOpen}
+                  setValue={setPenValue}
+                  setItems={setItems}
+                  onChangeValue={(newValue) =>
+                    pendingsetFilterCriteria(newValue)
+                  } // Ensure the correct setFilterCriteria function is used
+                  placeholder="Filter"
+                  style={{
+                    width: "100%", // Set width to 100% to fill the parent container
+                    borderColor: "#E6E6E8",
+                    backgroundColor: "#FFFFFF",
+                    borderRadius: 8,
+                    zIndex: 1,
+                  }}
+                  dropDownContainerStyle={{
+                    borderColor: "#E6E6E8",
+                    borderRadius: 8,
+                    width: "100%",
+                    backgroundColor: "#FFFFFF",
+                  }}
+                  placeholderStyle={{
+                    color: "#435060",
+                  }}
+                  ArrowDownIconComponent={({ style }) => (
+                    <AntDesign name="caretdown" size={14} color="black" />
+                  )}
+                />
+              </View>
             </View>
-          </View>
+          )}
           <ScrollView contentContainerStyle={styles.scrollView}>
-            <View className="w-full">
+            <View className="w-full z-0">
               {isprevioussales && (
                 <View>
                   <View className="flex flex-row justify-between items-center">
@@ -243,24 +434,24 @@ export default function Sales() {
                           : "text-[#25313E]"
                       }`}
                     >
-                      ({previousItem.length})
+                      ({filteredItems.length})
                     </Text>
                   </View>
-                  {previousItem.map((item, index) => (
+                  {filteredItems.map((item, index) => (
                     <PreviousItems
                       list=""
                       key={index}
                       icon={item.icon}
+                      id={item.id}
                       title={item.title}
                       qty={item.qty}
                       status={item.status}
                       value={item.value}
-                      onItemPressed={() => handleItemPressed(item)}
+                      onItemPressed={() => handleItemPressed(item.id)}
                     />
                   ))}
                 </View>
               )}
-              {/*  */}
               {ispendingOrder && (
                 <View>
                   <View className="flex flex-row justify-between items-center">
@@ -274,19 +465,20 @@ export default function Sales() {
                           : "text-[#25313E]"
                       }`}
                     >
-                      ({pendings.length})
+                      ({penfilteredItems.length})
                     </Text>
                   </View>
-                  {pendings.map((pending, index) => (
+                  {penfilteredItems.map((pending, index) => (
                     <PreviousItems
-                      list="previous"
+                      list="pending"
                       key={index}
+                      id={pending.id}
                       icon={pending.icon}
                       title={pending.title}
                       qty={pending.qty}
                       status={pending.status}
                       value={pending.value}
-                      onItemPressed={() => handleItemPressed(pending)}
+                      onItemPressed={() => handleItemPressed(pending.id)}
                     />
                   ))}
                 </View>
@@ -294,7 +486,7 @@ export default function Sales() {
             </View>
           </ScrollView>
           <ProductDetails
-            userId=""
+            userId={orderId}
             status={false}
             isOpen={isModalOpen}
             closeModal={handleModalClose}

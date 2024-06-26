@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Image,
@@ -8,7 +8,9 @@ import {
   Platform,
   ScrollView,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
   StyleSheet,
+  Animated,
 } from "react-native";
 import { Link } from "expo-router";
 import { useUser } from "../../context/user-provider";
@@ -17,9 +19,11 @@ const usersvg = require("../../assets/icon/user.png");
 const location = require("../../assets/icon/location.png");
 const dropdown = require("../../assets/icon/dropdown.png");
 const phone = require("../../assets/icon/phone.png");
+const check = require("../../assets/icon/check.png");
+const search = require("../../assets/icon/search.png");
+const loading = require("../../assets/gif/loading.gif");
 const emailsvg = require("../../assets/icon/email.png");
 import { PINinput } from "../../components/ui/text-input/pin-input";
-import { CustomDropdown } from "../../components/ui/text-input/select-input";
 import CountdownTimer from "../../components/ui/display/CountdownTimer";
 import OTPTextInput from "react-native-otp-textinput";
 import { CreatedModal } from "../../components/ui/modals/CreatedModal";
@@ -52,6 +56,7 @@ type NavigationProp = CompositeNavigationProp<
 >;
 const SignUp = () => {
   const { user, setUser } = useUser();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const [selectedValue, setSelectedValue] = useState("");
   const [otp, setOTP] = useState("");
   const [confirmpin, setConfirmPin] = useState("");
@@ -63,7 +68,10 @@ const SignUp = () => {
   const [isTimedOut, setIsTimedOut] = useState<boolean>(false);
   const [isConfirmPass, setisConfirmPass] = useState<boolean>(false);
   const [isExistModalOpen, setIsExistModalOpen] = useState(false);
-  const [states, setStates] = useState([]);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [states, setStates] = useState<string[]>([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
@@ -84,6 +92,13 @@ const SignUp = () => {
   const handleInputChange = (value: string, name: string) => {
     setFormData({ ...formData, [name]: value });
   };
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 10000,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const fetchStates = async () => {
     try {
@@ -186,6 +201,15 @@ const SignUp = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const filteredOptions = states.filter((option) =>
+    option.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSelect = (value: string) => {
+    setSelectedValue(value);
+    setModalVisible(false);
   };
 
   return (
@@ -375,7 +399,7 @@ const SignUp = () => {
                 Go Back
               </Link>
             </TouchableOpacity>
-            <View className="h-auto w-full flex justify-start items-start">
+            <View className="h-auto z-10 w-full flex justify-start items-start">
               <Text className="text-[24px] font-bold text-[#343434] font-DMSans">
                 Fill out the form to register.
               </Text>
@@ -414,27 +438,76 @@ const SignUp = () => {
                     />
                   </View>
                 </View>
-                <View className="my-2">
+                <View className="my-2 z-20 relative">
                   <TouchableOpacity
                     onPress={() => setisSelectDropdown(!isSelectDropdown)}
                     className="text-[12px] font-normal text-[#343434] font-DMSans"
                   >
                     <Text>Location</Text>
                   </TouchableOpacity>
-                  <View className="mt-2 border-[1px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]">
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(!modalVisible)}
+                    className="mt-2  border-[1px] h-[50px] px-3 flex flex-row justify-start items-center border-[#A9A9A9] rounded-[4px]"
+                  >
                     <Image source={location} />
-                    <CustomDropdown
-                      InputClass="top-[52%]"
-                      isLoading={loading}
-                      options={states}
-                      selectedValue={selectedValue}
-                      placeholder="Select Location"
-                      onSelect={(value) => setSelectedValue(value)}
-                    />
+                    {selectedValue ? (
+                      <Text className="ml-2 text-[#181818] text-[14px] font-semibold font-DMSans">
+                        {selectedValue}
+                      </Text>
+                    ) : (
+                      <Text className="text-[#A9A9A9] ml-2 text-[14px] font-semibold font-DMSans">
+                        Select Location
+                      </Text>
+                    )}
                     <Image source={dropdown} className="absolute right-3" />
-                  </View>
+                  </TouchableOpacity>
+                  {modalVisible && (
+                    <View className="w-full absolute top-[100%] rounded-[4px]">
+                      <View className="w-full h-full flex transition-[.5s] flex-1 justify-center items-center">
+                        <TouchableWithoutFeedback onPress={() => {}}>
+                          <View
+                            className={`w-[315px] h-[276px] bg-white px-4 py-2 overflow-y-scroll rounded-lg shadow-lg`}
+                          >
+                            <View className="h-[32px] relative px-2 flex flex-row justify-between items-center w-full rounded-[4px] border-[1px] border-[#CCD0DC]">
+                              <TextInput
+                                className="h-full w-full"
+                                value={searchQuery}
+                                onChangeText={(text) => setSearchQuery(text)}
+                              />
+                              <View className="absolute right-2 flex flex-row justify-center items-center w-auto ">
+                                <Text className="text-[10px] mr-2 font-DMSans font-normal text-[#999999]">
+                                  Search
+                                </Text>
+                                <Image source={search} />
+                              </View>
+                            </View>
+                            {loading ? (
+                              <View>
+                                <Text>Loading....</Text>
+                              </View>
+                            ) : (
+                              <ScrollView className="flex-grow">
+                                {filteredOptions.map((option, index) => (
+                                  <TouchableOpacity
+                                    key={index}
+                                    className="h-auto flex py-4 flex-row justify-between items-start active:bg-black px-2 rounded-md"
+                                    onPress={() => handleSelect(option)}
+                                  >
+                                    <Text>{option}</Text>
+                                    {selectedValue === option && (
+                                      <Image source={check} />
+                                    )}
+                                  </TouchableOpacity>
+                                ))}
+                              </ScrollView>
+                            )}
+                          </View>
+                        </TouchableWithoutFeedback>
+                      </View>
+                    </View>
+                  )}
                 </View>
-                <View className="my-2">
+                <View className="my-2 z-0">
                   <Text className="text-[12px] font-normal text-[#343434] font-DMSans">
                     Phone number
                   </Text>
@@ -467,7 +540,7 @@ const SignUp = () => {
                 </View>
               </View>
             </View>
-            <View className="h-[38px] w-full flex justify-center flex-row gap-2 items-center">
+            <View className="h-[38px] z-0 w-full flex justify-center flex-row gap-2 items-center">
               <Text className="text-[#343434] font-normal text-[16px]">
                 You already have an account?
               </Text>

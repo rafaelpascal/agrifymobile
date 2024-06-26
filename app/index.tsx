@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
+import { get_deviceId } from "../utils/apiService";
 import * as ScreenOrientation from "expo-screen-orientation";
+import * as Device from "expo-device";
+import * as Application from "expo-application";
 import {
   CompositeNavigationProp,
   NavigatorScreenParams,
@@ -35,7 +38,22 @@ export default function HomeScreen() {
   const [orientation, setOrientation] = useState(
     ScreenOrientation.Orientation.PORTRAIT_UP
   );
+  const [deviceInfo, setDeviceInfo] = useState({
+    brand: "",
+    model: "",
+    systemName: "",
+    systemVersion: "",
+    uniqueId: "",
+    deviceType: "",
+    manufacturer: "",
+    totalMemory: "",
+    isTablet: "",
+    isDevice: "",
+  });
+
   const [isLoaded, setIsLoaded] = useState(false);
+  const [dbDeviceId, setdbDeviceId] = useState(false);
+  const [retrieveddeviceid, setretrieveddeviceid] = useState("");
   const [selectedValue, setSelectedValue] = useState("en");
 
   const options = [
@@ -44,6 +62,80 @@ export default function HomeScreen() {
     { name: "Igbo", abbreviation: "ig" },
     { name: "Hausa", abbreviation: "ha" },
   ];
+
+  useEffect(() => {
+    const fetchDeviceInfo = async () => {
+      const brand = Device.brand || "Unknown";
+      const model = Device.modelName || "Unknown";
+      const systemName = Device.osName || "Unknown";
+      const systemVersion = Device.osVersion || "Unknown";
+
+      // Fetch unique ID based on platform
+      // Fetch unique ID based on platform
+      let uniqueId = "Unknown";
+      if (Device.osName === "Android") {
+        uniqueId = Application.getAndroidId() || "Unknown";
+      } else if (Device.osName === "iOS") {
+        uniqueId = (await Application.getIosIdForVendorAsync()) || "Unknown";
+      }
+
+      let deviceType = "Unknown";
+      switch (Device.deviceType) {
+        case Device.DeviceType.PHONE:
+          deviceType = "Phone";
+          break;
+        case Device.DeviceType.TABLET:
+          deviceType = "Tablet";
+          break;
+        case Device.DeviceType.DESKTOP:
+          deviceType = "Desktop";
+          break;
+        case Device.DeviceType.TV:
+          deviceType = "TV";
+          break;
+      }
+
+      const manufacturer = Device.manufacturer || "Unknown";
+      const totalMemory = Device.totalMemory
+        ? `${Device.totalMemory} bytes`
+        : "Unknown";
+      const isDevice = Device.isDevice ? "Yes" : "No";
+
+      const info = {
+        brand,
+        model,
+        systemName,
+        systemVersion,
+        uniqueId,
+        deviceType,
+        manufacturer,
+        totalMemory,
+        isTablet: deviceType === "Tablet" ? "Yes" : "No",
+        isDevice,
+      };
+
+      setDeviceInfo(info);
+      setretrieveddeviceid(info.uniqueId);
+    };
+
+    fetchDeviceInfo();
+  }, []);
+
+  useEffect(() => {
+    const get_device = async () => {
+      try {
+        const device = await get_deviceId(retrieveddeviceid);
+        if (device.data && device.data.device && device.data.device.deviceId) {
+          setdbDeviceId(true);
+        } else {
+          console.log("Device ID not found in response:", device);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    get_device();
+  }, [retrieveddeviceid]);
 
   useEffect(() => {
     const subscription = ScreenOrientation.addOrientationChangeListener(
@@ -56,11 +148,11 @@ export default function HomeScreen() {
       ScreenOrientation.removeOrientationChangeListener(subscription);
     };
   }, []);
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoaded(true);
-    }, 2000);
-  }, [isLoaded]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setIsLoaded(true);
+  //   }, 2000);
+  // }, [isLoaded]);
 
   const changeLanguage = (lng: string) => {
     setSelectedValue(lng);
@@ -68,7 +160,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <StatusBar style="auto" hidden={true} />
+      <StatusBar style="auto" hidden={false} />
       {isLoaded ? (
         <View className="relative flex-1 items-center justify-evenly bg-[#fff] px-3">
           <Image
@@ -108,12 +200,35 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       ) : (
-        <View className="flex-1 items-center justify-center bg-[#00A45F]">
-          <Image
-            source={require("@/assets/icon/agrifyLogo.png")}
-            style={{ alignSelf: "center" }}
-          />
-        </View>
+        <>
+          {dbDeviceId ? (
+            <View className="flex-1 px-4 relative items-center justify-center bg-[#00A45F]">
+              <Image
+                source={require("@/assets/icon/agrifyLogin.png")}
+                style={{ alignSelf: "center" }}
+              />
+              <View className="w-full absolute bottom-[120px]">
+                <TouchableOpacity className="w-full h-[50px] flex justify-center items-center mb-4 bg-[#FFFFFF] border-[1px] border-[#00A45F]">
+                  <Text className="text-[16px] font-DMSans font-semibold text-[#343434]">
+                    Register
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="w-full h-[50px]  flex justify-center items-center  bg-[#FFFFFF] border-[1px] border-[#00A45F]">
+                  <Text className="text-[16px] font-DMSans font-semibold text-[#343434]">
+                    Login
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View className="flex-1 items-center justify-center bg-[#00A45F]">
+              <Image
+                source={require("@/assets/icon/agrifyLogo.png")}
+                style={{ alignSelf: "center" }}
+              />
+            </View>
+          )}
+        </>
       )}
     </>
   );
