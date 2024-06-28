@@ -56,7 +56,7 @@ export const ProductCreated = ({
             Successful!
           </Text>
           <Text className="text-center text-[14px] text-[#A9A9A9]">
-            Your product has been added to your store
+            {userId}
           </Text>
         </View>
       </View>

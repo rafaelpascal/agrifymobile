@@ -194,7 +194,9 @@ export const get_all_order = async (marchantId: string) => {
     );
     return response.data;
   } catch (error) {
-    throw error;
+    console.log(error);
+
+    return error;
   }
 };
 
@@ -220,6 +222,91 @@ export const get_deviceId = async (deviceId: string | undefined) => {
   try {
     const response = await axios.get(
       `${StringapiUrl}/api/auth/checkdevice/${deviceId}`,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const get_banks = async () => {
+  try {
+    const response = await axios.get(
+      `${StringapiUrl}/api/marchant/acc/get_banks`,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const varify_acc = async (data: object) => {
+  try {
+    const response = await axios.post(
+      `${StringapiUrl}/api/marchant/acc/validate_acc`,
+      data,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const save_acc = async (data: object) => {
+  try {
+    const response = await axios.post(
+      `${StringapiUrl}/api/marchant/acc/account_number`,
+      data,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// change pin
+export const change_pin = async (marchantId: object) => {
+  try {
+    const response = await axios.post(
+      `${StringapiUrl}/api/auth/change_pin`,
+      marchantId,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+// change pin
+export const new_pin = async (data: object) => {
+  try {
+    const response = await axios.post(
+      `${StringapiUrl}/api/auth/verify_otp_pin`,
+      data,
       {
         headers: {
           "x-api-key": `${key}`,

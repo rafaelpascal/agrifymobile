@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 const homeFocused = require("../../assets/navigations/homeFocused.png");
@@ -11,16 +11,25 @@ const shop = require("../../assets/navigations/shop1.png");
 const settingFocused = require("../../assets/navigations/settingfocused.png");
 const settingsvg = require("../../assets/navigations/setting.png");
 import { Image } from "react-native";
+import { authenticateAsync } from "expo-local-authentication";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  useEffect(() => {
+    const authenticate = async () => {
+      const res = await authenticateAsync();
+      console.log(res);
+    };
+    authenticate();
+  }, []);
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        // tabBarStyle: { height: 60 },
+        tabBarStyle: { height: 80 },
       }}
     >
       <Tabs.Screen

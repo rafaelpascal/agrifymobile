@@ -196,6 +196,8 @@ const SignUp = () => {
       // };
       // const res = await createpin(data);
       // setUser(res.data.fndmarId.id);
+      const user = "087a8b59-6f41-4d27-8ce3-f6c603294829";
+      setUser(user);
       setIsModalOpen(true);
       setClear(true);
     } catch (error) {
@@ -358,7 +360,7 @@ const SignUp = () => {
                         marginHorizontal: 5,
                       }}
                     />
-                    <View className="h-[36px] flex justify-between items-center flex-row">
+                    <View className="h-[36px] flex justify-center items-center flex-row">
                       {isTimedOut === false && (
                         <Text className="mr-[2px]"> Resend in</Text>
                       )}

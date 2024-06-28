@@ -96,6 +96,7 @@ export default function HomeScreen() {
   const [activeDropdownIndex, setActiveDropdownIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
+  const [message, setMessage] = useState("");
   const [iscategories, setCategories] = useState<Category[]>([]);
   const [productname, setProductname] = useState<ProductName[]>([]);
   const [currentQty, setcurrentQty] = useState("");
@@ -153,6 +154,7 @@ export default function HomeScreen() {
     const getallOrder = async () => {
       try {
         const all_previous_sales = await get_all_order(user);
+
         const previoussales = all_previous_sales?.completed_sales.rows;
         const totalOrder = all_previous_sales?.completed_sales.count;
 
@@ -169,8 +171,14 @@ export default function HomeScreen() {
         });
         setistotalOrder(totalOrder);
         setItems(transformedData);
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        if (error.response) {
+          console.log("Response Data:", error.response.data);
+          console.log("Response Status:", error.response.status);
+          console.log("Response Headers:", error.response.headers);
+        } else {
+          console.error("Error Message:", error.message);
+        }
       }
     };
     getallOrder();
@@ -267,8 +275,6 @@ export default function HomeScreen() {
     name: string,
     value: string | { value: string; label: string } | null
   ) => {
-    console.log(index, name, value);
-
     let newValue: string | null;
     if (typeof value === "object" && value !== null) {
       newValue = value.value;
@@ -354,6 +360,7 @@ export default function HomeScreen() {
       };
       const res = await new_product(formData);
       if (res) {
+        setMessage("Your product has been added to your store");
         setIsModalOpen(true);
       }
     } catch (error) {
@@ -403,7 +410,7 @@ export default function HomeScreen() {
                   showsVerticalScrollIndicator={false}
                 >
                   {isreview ? (
-                    <View className="w-full relative h-[70vh]">
+                    <View className="w-full relative h-[73vh]">
                       <TouchableOpacity
                         onPress={() => setPreview(false)}
                         className="bg-themeGreen/10 w-[78px] h-[35px] flex justify-center items-center flex-row rounded-md"
@@ -422,7 +429,10 @@ export default function HomeScreen() {
                         <Text className="text-[12px] font-DMSans font-bold text-[#25313E]">
                           Product Information
                         </Text>
-                        <TouchableOpacity className="flex flex-row justify-center items-center">
+                        <TouchableOpacity
+                          onPress={() => setPreview(false)}
+                          className="flex flex-row justify-center items-center"
+                        >
                           <AntDesign name="edit" size={20} color="#415BE6" />
                           <Text className="text-[12px] ml-1 font-DMSans font-bold text-[#415BE6]">
                             Edit
@@ -448,20 +458,6 @@ export default function HomeScreen() {
                         </View>
                         <View className="flex flex-row justify-between w-full items-center h-[27px]">
                           <Text className="text-[12px] font-DMSans font-normal text-[#435060]">
-                            Product Quantity
-                          </Text>
-                          {inputs.map((input, index) => (
-                            <Text
-                              key={index}
-                              className="text-[12px] font-DMSans font-bold text-[#25313E]"
-                            >
-                              {input.quantity}
-                            </Text>
-                          ))}
-                        </View>
-
-                        <View className="flex flex-row justify-between w-full items-center h-[27px]">
-                          <Text className="text-[12px] font-DMSans font-normal text-[#435060]">
                             Product Image
                           </Text>
                           <View className="rounded-lg w-[36px] h-[29px]">
@@ -478,13 +474,24 @@ export default function HomeScreen() {
                             ))}
                           </View>
                         </View>
+                        <View className="flex flex-row justify-between w-full items-center h-[27px]">
+                          <Text className="text-[12px] font-DMSans font-normal text-[#435060]">
+                            How many tubers do you have in stock?
+                          </Text>
+                          <Text className="text-[12px] font-DMSans font-bold text-[#25313E]">
+                            {currentQty}
+                          </Text>
+                        </View>
                       </View>
                       {/*  */}
                       <View className="flex flex-row justify-between w-full items-center h-[27px]">
                         <Text className="text-[12px] font-DMSans font-bold text-[#25313E]">
                           Pricing & Quantity
                         </Text>
-                        <TouchableOpacity className="flex flex-row justify-center items-center">
+                        <TouchableOpacity
+                          onPress={() => setPreview(false)}
+                          className="flex flex-row justify-center items-center"
+                        >
                           <AntDesign name="edit" size={20} color="#415BE6" />
                           <Text className="text-[12px] ml-1 font-DMSans font-bold text-[#415BE6]">
                             Edit
@@ -507,14 +514,19 @@ export default function HomeScreen() {
                         </View>
                         <View className="flex flex-row justify-between w-full items-center h-[27px]">
                           <Text className="text-[12px] font-DMSans font-normal text-[#435060]">
-                            How many tubers do you have in stock?
+                            Product Quantity
                           </Text>
-                          <Text className="text-[12px] font-DMSans font-bold text-[#25313E]">
-                            {currentQty}
-                          </Text>
+                          {inputs.map((input, index) => (
+                            <Text
+                              key={index}
+                              className="text-[12px] font-DMSans font-bold text-[#25313E]"
+                            >
+                              {input.quantity}
+                            </Text>
+                          ))}
                         </View>
                       </View>
-                      <View className="absolute bottom-0 flex flex-row justify-between items-center">
+                      <View className="absolute bottom-3 left-1 flex flex-row justify-between items-center">
                         <TouchableOpacity
                           onPress={() => setPreview(false)}
                           className="h-[50px] w-[49%] border-[1px] bg-transparent border-themeGreen rounded-[4px] flex justify-center items-center"
@@ -532,12 +544,6 @@ export default function HomeScreen() {
                           </Text>
                         </TouchableOpacity>
                       </View>
-                      <ProductCreated
-                        userId=""
-                        isOpen={isModalOpen}
-                        handleContinue={handleContinue}
-                        closeModal={handleModalClose}
-                      />
                     </View>
                   ) : (
                     <View className="w-full h-full">
@@ -766,7 +772,7 @@ export default function HomeScreen() {
                           </View>
                         </View>
                       ) : (
-                        <View className="h-full">
+                        <View className="h-[70vh]">
                           <TouchableOpacity
                             onPress={() => setIsNewProduct(false)}
                             className="bg-themeGreen/10 w-[78px] h-[35px] flex justify-center items-center flex-row rounded-md"
@@ -1148,6 +1154,12 @@ export default function HomeScreen() {
             )}
           </View>
         </DashboardArea>
+        <ProductCreated
+          userId={message}
+          isOpen={isModalOpen}
+          handleContinue={handleContinue}
+          closeModal={handleModalClose}
+        />
       </KeyboardAvoidingView>
     </>
   );

@@ -16,9 +16,16 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 type RootStackParamList = {
-  "(tabs)": NavigatorScreenParams<TabParamList>;
+  "(auth)": NavigatorScreenParams<AuthStackParamList>;
   "+not-found": undefined;
   Other: undefined;
+  // "(tabs)": NavigatorScreenParams<TabParamList>;
+};
+
+export type AuthStackParamList = {
+  sign_in: undefined;
+  sign_up: undefined;
+  // Add other screens as needed
 };
 
 type TabParamList = {
@@ -29,7 +36,7 @@ type TabParamList = {
 };
 
 type NavigationProp = CompositeNavigationProp<
-  NativeStackNavigationProp<RootStackParamList, "(tabs)">,
+  NativeStackNavigationProp<RootStackParamList, "(auth)">,
   BottomTabNavigationProp<TabParamList>
 >;
 
@@ -148,20 +155,29 @@ export default function HomeScreen() {
       ScreenOrientation.removeOrientationChangeListener(subscription);
     };
   }, []);
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setIsLoaded(true);
-  //   }, 2000);
-  // }, [isLoaded]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 2000);
+  }, [isLoaded]);
 
   const changeLanguage = (lng: string) => {
     setSelectedValue(lng);
   };
 
+  const handleLoginPage = () => {
+    navigation.navigate("(auth)", { screen: "sign_in" });
+  };
+
+  const handleSignupPage = () => {
+    navigation.navigate("(auth)", { screen: "sign_up" });
+  };
+
   return (
     <>
       <StatusBar style="auto" hidden={false} />
-      {isLoaded ? (
+      {isLoaded && dbDeviceId === false ? (
         <View className="relative flex-1 items-center justify-evenly bg-[#fff] px-3">
           <Image
             source={require("@/assets/icon/agrifyLogodark.png")}
@@ -190,13 +206,13 @@ export default function HomeScreen() {
               ))}
             </View>
           </View>
-          <TouchableOpacity className="absolute bottom-10 bg-themeGreen w-full h-auto flex justify-center items-center rounded-[4px]">
-            <Link
-              href="/sign-up"
-              className="text-[16px] w-full h-full text-[#fff] text-center py-5 flex justify-center items-center font-bold"
-            >
+          <TouchableOpacity
+            onPress={handleSignupPage}
+            className="absolute bottom-10 bg-themeGreen w-full h-auto flex justify-center items-center rounded-[4px]"
+          >
+            <Text className="text-[16px] w-full h-full text-[#fff] text-center py-5 flex justify-center items-center font-bold">
               Ok
-            </Link>
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -213,7 +229,10 @@ export default function HomeScreen() {
                     Register
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="w-full h-[50px]  flex justify-center items-center  bg-[#FFFFFF] border-[1px] border-[#00A45F]">
+                <TouchableOpacity
+                  onPress={handleLoginPage}
+                  className="w-full h-[50px]  flex justify-center items-center  bg-[#FFFFFF] border-[1px] border-[#00A45F]"
+                >
                   <Text className="text-[16px] font-DMSans font-semibold text-[#343434]">
                     Login
                   </Text>

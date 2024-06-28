@@ -8,20 +8,27 @@
     "backgroundColor": "#ffffff",
     "icon": "./assets/icon/agrifyLogodark.png",
     "extra": {
-      "apiUrl": "http://192.168.0.176:5000",
-      "apiKey": "f7e67652e182943da776fb8c7ade8701acb0a97903101227254a692921a4"
+      "apiUrl": "http://192.168.1.194:5000",
+      "apiKey": "f7e67652e182943da776fb8c7ade8701acb0a97903101227254a692921a4",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "cab11ade-983a-4087-9724-8bdb85e14ed4"
+      }
     },
     "splash": {
-      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#00A45F"
     },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow agrifymobile to access your camera",
-        "NSMicrophoneUsageDescription": "Allow agrifymobile to access your microphone"
-      }
+        "NSCameraUsageDescription": "This app uses the camera to scan barcodes on event tickets.",
+        "NSMicrophoneUsageDescription": "Allow agrifymobile to access your microphone",
+        "NSFaceIDUsageDescription": "Allow agrifymobile to use Face ID."
+      },
+      "bundleIdentifier": "com.rafaelpascal1.agrifymobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,8 +39,13 @@
         "CAMERA",
         "RECORD_AUDIO",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+        "WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ],
+      "package": "com.rafaelpascal1.agrifymobile"
     },
     "web": {
       "bundler": "metro",
@@ -48,6 +60,13 @@
           "cameraPermission": "Allow agrifymobile to access your camera",
           "microphonePermission": "Allow agrifymobile to access your microphone",
           "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow agrifymobile to use Face ID.",
+          "NSFaceIDUsageDescription": "Allow agrifymobile to use Face ID."
         }
       ]
     ],
