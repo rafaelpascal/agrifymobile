@@ -34,7 +34,7 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   return (
     <View>
       {timeLeft > 0 ? (
-        <Text className="font-semibold font-DMSans text-[12px] ">
+        <Text className="font-semibold font-DMSans text-[14px] ">
           {Math.floor(timeLeft / 60)}:{("0" + (timeLeft % 60)).slice(-2)}
         </Text>
       ) : (

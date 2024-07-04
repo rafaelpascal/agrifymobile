@@ -68,7 +68,7 @@ export const ShopProductDetails = ({
 
   return (
     <BaseModal userId={userId} isOpen={isOpen} closeModal={closeModal}>
-      <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[12px] flex justify-between items-center w-full">
+      <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[14px] flex justify-between items-center w-full">
         <Text className="text-[16px] font-bold font-DMSans text-themeGreen">
           Product Details
         </Text>
@@ -86,58 +86,58 @@ export const ShopProductDetails = ({
         </View>
         <View className="border-[1px] border-[#E6E6E8] px-3 rounded-[8px]">
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Product Category:
             </Text>
-            <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px]  font-DMSans font-bold text-[#25313E]">
               {itemp.category}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Product Name:
             </Text>
-            <Text className="text-center text-[12px] font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px] font-DMSans font-bold text-[#25313E]">
               {itemp.title}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Total Quantity:
             </Text>
-            <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px]  font-DMSans font-bold text-[#25313E]">
               {itemp.qty} baskets
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Quantity Sold:
             </Text>
-            <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px]  font-DMSans font-bold text-[#25313E]">
               3 baskets
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Quantity Lef:
             </Text>
-            <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px]  font-DMSans font-bold text-[#25313E]">
               2 baskets
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Price:
             </Text>
-            <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px]  font-DMSans font-bold text-[#25313E]">
               {price}
             </Text>
           </View>
           <View className="flex h-auto my-2 w-full flex-row items-start justify-between lg:w-[336px]">
-            <Text className="text-center text-[12px] font-DMSans font-normal">
+            <Text className="text-center text-[14px] font-DMSans font-normal">
               Date Added:
             </Text>
-            <Text className="text-center text-[12px]  font-DMSans font-bold text-[#25313E]">
+            <Text className="text-center text-[14px]  font-DMSans font-bold text-[#25313E]">
               {itemp.dateAdded}
             </Text>
           </View>
@@ -145,14 +145,14 @@ export const ShopProductDetails = ({
         <View className="flex h-auto my-2 w-full flex-row items-start justify-between">
           {itemp.qty <= 100 ? (
             <View className="bg-themeGreen/10 w-full  rounded-[4px] px-2 py-3">
-              <Text className="text-center text-[12px] font-DMSans font-bold text-themeGreen">
+              <Text className="text-center text-[14px] font-DMSans font-bold text-themeGreen">
                 You have 4 Baskets Left
               </Text>
             </View>
           ) : (
             <View className="bg-[#A41E00]/5 w-full flex flex-row justify-center items-center rounded-[4px] px-2 py-3">
               <Image source={warn} />
-              <Text className="text-center ml-2 text-[12px]  font-DMSans font-bold text-[#A41E00]">
+              <Text className="text-center ml-2 text-[14px]  font-DMSans font-bold text-[#A41E00]">
                 You have 2 Baskets Left, Restock!
               </Text>
             </View>

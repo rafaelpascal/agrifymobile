@@ -56,11 +56,11 @@ export const PINinput: React.FC<OTPInputProps> = ({
           key={index}
           keyboardType="numeric"
           maxLength={1}
-          value={otp[index] ? "*" : ""}
+          value={otp[index]}
           onChangeText={(text) => handleChange(text, index)}
           onKeyPress={(e) => handleKeyDown(e, index)}
           ref={(el) => (inputsRef.current[index] = el)}
-          className="w-[63px] h-[64px] text-center text-[20px] border-[1px] border-[#A9A9A9] rounded-full"
+          className="w-[63px] h-[64px] text-center text-[24px] font-normal border-[1px] border-[#A9A9A9] rounded-full"
         />
       ))}
     </View>

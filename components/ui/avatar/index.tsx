@@ -1,5 +1,12 @@
 import { createAvatarUrl } from "../../../utils/helpers";
-import { View, Image, Text, StyleSheet, ImageBackground } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
 
 interface AvatarProps {
   name: string;
@@ -10,6 +17,7 @@ interface AvatarProps {
   wrapperClassName?: string;
   avatarTextContainerClassName?: string;
   rounded?: boolean;
+  onPress: () => void;
 }
 
 export const Avatar = (props: AvatarProps) => {
@@ -22,6 +30,7 @@ export const Avatar = (props: AvatarProps) => {
     wrapperClassName,
     avatarTextContainerClassName,
     rounded,
+    onPress,
   } = props;
 
   const avatarUrl = createAvatarUrl({
@@ -32,20 +41,22 @@ export const Avatar = (props: AvatarProps) => {
   });
 
   return (
-    <View className="flex justify-end items-end flex-row">
-      {img ? (
-        <Image
-          source={{ uri: img }}
-          className="w-[40px] h-[40px] rounded-full"
-        />
-      ) : (
-        <ImageBackground
-          source={{ uri: avatarUrl }}
-          className="w-[40px] h-[40px] rounded-full"
-          imageStyle={rounded && styles.roundedImage}
-        />
-      )}
-    </View>
+    <TouchableOpacity onPress={onPress} style={styles.wrapper}>
+      <View className="flex justify-end items-end flex-row">
+        {img ? (
+          <Image
+            source={{ uri: img }}
+            className="w-[40px] h-[40px] rounded-full"
+          />
+        ) : (
+          <ImageBackground
+            source={{ uri: avatarUrl }}
+            className="w-[40px] h-[40px] rounded-full"
+            imageStyle={rounded && styles.roundedImage}
+          />
+        )}
+      </View>
+    </TouchableOpacity>
   );
 };
 

@@ -11,18 +11,9 @@ const shop = require("../../assets/navigations/shop1.png");
 const settingFocused = require("../../assets/navigations/settingfocused.png");
 const settingsvg = require("../../assets/navigations/setting.png");
 import { Image } from "react-native";
-import { authenticateAsync } from "expo-local-authentication";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
-  useEffect(() => {
-    const authenticate = async () => {
-      const res = await authenticateAsync();
-      console.log(res);
-    };
-    authenticate();
-  }, []);
 
   return (
     <Tabs

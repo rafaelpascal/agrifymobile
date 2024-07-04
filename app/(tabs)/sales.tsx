@@ -262,7 +262,7 @@ export default function Sales() {
             <View className="h-[103px] flex flex-col justify-between items-start w-[49%] rounded-[8px] border-[1px] border-[#343434] bg-[#FFFBEA] mr-1 p-[10px]">
               <View className="w-[78px] h-[43px]">
                 <Image source={sales} className="w-[38px] h-[38px] mb-1" />
-                <Text className="text-[12px] font-DMSans text-[#435060] font-semibold">
+                <Text className="text-[14px] font-DMSans text-[#435060] font-semibold">
                   Sales Balance
                 </Text>
               </View>
@@ -273,7 +273,7 @@ export default function Sales() {
             <View className="h-[103px]  w-[49%] rounded-[8px] border-[1px] border-[#343434] bg-[#F2FCFF] ml-1  flex flex-col justify-between items-start p-[10px]">
               <View className="w-full h-[43px]">
                 <Image source={order} className="w-[38px] h-[38px] mb-1" />
-                <Text className="text-[12px] w-full font-DMSans text-[#435060] font-semibold">
+                <Text className="text-[14px] w-full font-DMSans text-[#435060] font-semibold">
                   Pending Order
                 </Text>
               </View>
@@ -282,12 +282,12 @@ export default function Sales() {
               </Text>
             </View>
           </View>
-          <View className="h-[49px] w-full rounded-[12px] bg-[#F5F6FA] flex flex-row justify-between items-center px-[4px]">
+          <View className="h-[49px] w-full rounded-[14px] bg-[#F5F6FA] flex flex-row justify-between items-center px-[4px]">
             <TouchableOpacity
               className={`${
                 isprevioussales
-                  ? "bg-[#fff] h-[40px] w-[48%] rounded-[12px] flex justify-center items-center"
-                  : "bg-transparent mr-1 h-[40px] w-[172px] rounded-[12px] flex justify-center items-center"
+                  ? "bg-[#fff] h-[40px] w-[48%] rounded-[14px] flex justify-center items-center"
+                  : "bg-transparent mr-1 h-[40px] w-[172px] rounded-[14px] flex justify-center items-center"
               }`}
               onPress={handlePreviousSales}
             >
@@ -305,8 +305,8 @@ export default function Sales() {
             <TouchableOpacity
               className={`${
                 ispendingOrder
-                  ? "bg-[#fff] h-[40px] w-[48%] rounded-[12px] flex justify-center items-center"
-                  : "bg-transparent ml-1 h-[40px] w-[172px] rounded-[12px] flex justify-center items-center"
+                  ? "bg-[#fff] h-[40px] w-[48%] rounded-[14px] flex justify-center items-center"
+                  : "bg-transparent ml-1 h-[40px] w-[172px] rounded-[14px] flex justify-center items-center"
               }`}
               onPress={handlependingOrder}
             >
@@ -323,7 +323,7 @@ export default function Sales() {
           </View>
           {isprevioussales && (
             <View className="my-2 flex flex-row justify-between items-center z-10">
-              <View className="w-[60%] flex-row px-4 flex justify-start items-center h-[36px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
+              <View className="w-[60%] flex-row px-4 flex justify-start items-center h-[48px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
                 <Feather name="search" size={20} color="black" />
                 <TextInput
                   placeholder="Search..."
@@ -334,7 +334,7 @@ export default function Sales() {
                 ></TextInput>
               </View>
 
-              <View className="w-[40%] mt-3 flex-row px-2 flex justify-between items-center h-[36px] bg-[#FFFFFF] rounded-[8px]">
+              <View className="w-[40%] flex-row px-2 flex justify-between items-center h-[36px] bg-[#FFFFFF] rounded-[8px]">
                 <DropDownPicker
                   open={open}
                   value={value}
@@ -349,7 +349,7 @@ export default function Sales() {
                   style={{
                     width: "100%", // Set width to 100% to fill the parent container
                     borderColor: "#E6E6E8",
-                    backgroundColor: "#FFFFFF",
+                    backgroundColor: "#FFF",
                     borderRadius: 8,
                     zIndex: 1,
                   }}
@@ -361,6 +361,7 @@ export default function Sales() {
                   }}
                   placeholderStyle={{
                     color: "#435060",
+                    fontSize: 10,
                   }}
                   ArrowDownIconComponent={({ style }) => (
                     <AntDesign name="caretdown" size={14} color="black" />
@@ -371,7 +372,7 @@ export default function Sales() {
           )}
           {ispendingOrder && (
             <View className="my-2 flex flex-row justify-between items-center z-10">
-              <View className="w-[60%] flex-row px-4 flex justify-start items-center h-[36px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
+              <View className="w-[60%] flex-row px-4 flex justify-start items-center h-[48px] border-[1px] border-[#E6E6E8] bg-[#FFFFFF] rounded-[8px]">
                 <Feather name="search" size={20} color="black" />
                 <TextInput
                   placeholder="Search..."
@@ -382,7 +383,7 @@ export default function Sales() {
                 ></TextInput>
               </View>
 
-              <View className="w-[40%] mt-3 flex-row px-2 flex justify-between items-center h-[36px] bg-[#FFFFFF] rounded-[8px]">
+              <View className="w-[40%] flex-row px-2 flex justify-between items-center h-[36px] bg-[#FFFFFF] rounded-[8px]">
                 <DropDownPicker
                   open={open}
                   value={penvalue}

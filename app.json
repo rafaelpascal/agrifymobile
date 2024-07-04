@@ -6,9 +6,9 @@
     "orientation": "portrait",
     "scheme": "agrifymobile",
     "backgroundColor": "#ffffff",
-    "icon": "./assets/icon/agrifyLogodark.png",
+    "icon": "./assets/icon/agrifyicon.png",
     "extra": {
-      "apiUrl": "http://192.168.1.194:5000",
+      "apiUrl": "http://172.20.10.4:5000",
       "apiKey": "f7e67652e182943da776fb8c7ade8701acb0a97903101227254a692921a4",
       "router": {
         "origin": false
@@ -32,7 +32,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon/agrifyLogodark.png",
+        "foregroundImage": "./assets/icon/agrifyicon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -72,6 +72,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "owner": "rafaelpascal1"
   }
 }

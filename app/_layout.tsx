@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { UserProvider } from "@/context/user-provider";
+import { UserInactivityProvider } from "@/context/user-inactivity";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,10 +19,16 @@ export default function TabLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <UserProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack>
-    </UserProvider>
+    <UserInactivityProvider>
+      <UserProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(modals)/inactive"
+            options={{ headerShown: false }}
+          />
+        </Stack>
+      </UserProvider>
+    </UserInactivityProvider>
   );
 }

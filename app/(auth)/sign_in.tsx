@@ -1,20 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-  View,
-  Image,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Platform,
-  ScrollView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  StyleSheet,
-  Animated,
-  Alert,
-} from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {
   CompositeNavigationProp,
   NavigatorScreenParams,
@@ -23,6 +8,23 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import * as LocalAuthentication from "expo-local-authentication";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Device from "expo-device";
+import * as Haptics from "expo-haptics";
+import { useNavigation } from "@react-navigation/native";
+import * as Application from "expo-application";
+const back = require("../../assets/icon/goback.png");
+const exteriks = require("../../assets/icon/exteriks.png");
+import { FontAwesome6 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { sign_in, get_deviceId } from "../../utils/apiService";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 type RootStackParamList = {
   // "(auth)": NavigatorScreenParams<AuthStackParamList>;
@@ -44,109 +46,324 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 const SignIn = () => {
-  const [isBiometricSupported, setIsBiometricSupported] = React.useState(false);
-  const [biometricType, setBiometricType] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp>();
-  const [selectedValue, setSelectedValue] = useState("en");
+  const [code, setCode] = useState<number[]>([]);
+  const [isBiometricSupported, setisBiometricSupported] = useState(false);
+  const [IsAuthenticated, setIsAuthenticated] = useState(false);
+  const [dbDeviceId, setdbDeviceId] = useState(false);
+  const [retrieveddeviceid, setretrieveddeviceid] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+  const [deviceInfo, setDeviceInfo] = useState({
+    brand: "",
+    model: "",
+    systemName: "",
+    systemVersion: "",
+    uniqueId: "",
+    deviceType: "",
+    manufacturer: "",
+    totalMemory: "",
+    isTablet: "",
+    isDevice: "",
+  });
 
-  const options = [
-    { name: "English", abbreviation: "en" },
-    { name: "Yoruba", abbreviation: "yo" },
-    { name: "Igbo", abbreviation: "ig" },
-    { name: "Hausa", abbreviation: "ha" },
-  ];
+  const codeLength = Array(4).fill(0);
 
-  const changeLanguage = (lng: string) => {
-    setSelectedValue(lng);
+  const offset = useSharedValue(0);
+  const style = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: offset.value }],
+    };
+  });
+
+  const OFFSET = 20;
+  const TIME = 20;
+
+  useEffect(() => {
+    const fetchDeviceInfo = async () => {
+      const brand = Device.brand || "Unknown";
+      const model = Device.modelName || "Unknown";
+      const systemName = Device.osName || "Unknown";
+      const systemVersion = Device.osVersion || "Unknown";
+
+      // Fetch unique ID based on platform
+      // Fetch unique ID based on platform
+      let uniqueId = "Unknown";
+      if (Device.osName === "Android") {
+        uniqueId = Application.getAndroidId() || "Unknown";
+      } else if (Device.osName === "iOS") {
+        uniqueId = (await Application.getIosIdForVendorAsync()) || "Unknown";
+      }
+
+      let deviceType = "Unknown";
+      switch (Device.deviceType) {
+        case Device.DeviceType.PHONE:
+          deviceType = "Phone";
+          break;
+        case Device.DeviceType.TABLET:
+          deviceType = "Tablet";
+          break;
+        case Device.DeviceType.DESKTOP:
+          deviceType = "Desktop";
+          break;
+        case Device.DeviceType.TV:
+          deviceType = "TV";
+          break;
+      }
+
+      const manufacturer = Device.manufacturer || "Unknown";
+      const totalMemory = Device.totalMemory
+        ? `${Device.totalMemory} bytes`
+        : "Unknown";
+      const isDevice = Device.isDevice ? "Yes" : "No";
+
+      const info = {
+        brand,
+        model,
+        systemName,
+        systemVersion,
+        uniqueId,
+        deviceType,
+        manufacturer,
+        totalMemory,
+        isTablet: deviceType === "Tablet" ? "Yes" : "No",
+        isDevice,
+      };
+
+      setDeviceInfo(info);
+      setretrieveddeviceid(info.uniqueId);
+    };
+
+    fetchDeviceInfo();
+  }, []);
+
+  useEffect(() => {
+    const get_device = async () => {
+      try {
+        const device = await get_deviceId(retrieveddeviceid);
+        if (device.data && device.data.device && device.data.device.deviceId) {
+          setdbDeviceId(true);
+          setUserPhone(device.data.device.phone);
+        } else {
+          console.log("Device ID not found in response:", device);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    get_device();
+  }, [retrieveddeviceid]);
+
+  useEffect(() => {
+    if (code.length === 4) {
+      const codeString = code.join("");
+      const handle_signin = async () => {
+        try {
+          const data = {
+            pin_password: codeString,
+            phone: userPhone,
+            deviceId: retrieveddeviceid,
+          };
+          const singin = await sign_in(data);
+          if (singin.data.code === "00") {
+            navigation.navigate("(tabs)", { screen: "Home" });
+            setCode([]);
+          }
+        } catch (error) {
+          offset.value = withSequence(
+            withTiming(-OFFSET, { duration: TIME / 2 }),
+            withRepeat(withTiming(OFFSET, { duration: TIME }), 4, true),
+            withTiming(0, { duration: TIME / 2 })
+          );
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          setCode([]);
+        }
+      };
+      handle_signin();
+    }
+  }, [code]);
+
+  const onNumberPress = (number: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setCode([...code, number]);
   };
 
-  const handleLogin = () => {
-    navigation.navigate("(tabs)", { screen: "Home" });
+  const numberBackSpace = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setCode(code.slice(0, -1));
+  };
+
+  const checkBiometricSupport = async () => {
+    const compatible = await LocalAuthentication.hasHardwareAsync();
+    setisBiometricSupported(compatible);
   };
 
   useEffect(() => {
-    (async () => {
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      setIsBiometricSupported(compatible);
-    })();
-  });
+    checkBiometricSupport();
+  }, []);
 
-  // const handleBiometricAuth = async () => {
-  //   const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
-  //   if (!savedBiometrics)
-  //     return Alert.alert(
-  //       "Biometric record not found",
-  //       "Please verify your identity with your password",
-  //       [
-  //         {
-  //           text: "OK",
-  //           onPress: () => fallBackToDefaultAuth(),
-  //         },
-  //       ]
-  //     );
-  // };
-
-  // const fallBackToDefaultAuth = () => {
-  //   // Implement fallback authentication method here
-  //   console.log("Fallback to default authentication");
-  // };
-
-  const handleBiometricAuth = async () => {
-    const success = await LocalAuthentication.authenticateAsync();
-    console.log(success);
-
-    if (success) {
-      router.replace("/index");
+  const onBiometricPress = async () => {
+    try {
+      const { success } = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Authenticate with Touch ID",
+        fallbackLabel: "Enter Password",
+      });
+      setIsAuthenticated(success);
+      if (success) {
+        console.log("Biometric authentication successful");
+        router.push("/tabs/index");
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+    } catch (error) {
+      console.error("Error during biometric authentication:", error);
     }
   };
 
-  const authenticate = async () => {
-    const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: "Authenticate to access your account", // Optional
-    });
-
-    if (result.success) {
-      console.log("Authentication successful!");
-      // Proceed with authenticated actions
-    } else {
-      console.log("Authentication failed or canceled.");
-    }
-  };
+  // const onBiometricPress = async () => {
+  //   try {
+  //     const { success } = await LocalAuthentication.authenticateAsync();
+  //     console.log("Biometric authentication result:", success);
+  //     if (success) {
+  //       router.replace("/");
+  //     } else {
+  //       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during biometric authentication:", error);
+  //   }
+  // };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1"
-    >
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <View className="relative flex-1  w-full items-center justify-evenly bg-themeGreen px-3">
-          <View className="absolute bottom-48 w-[269px] h-auto bg-white flex justify-start py-[20px] rounded-[14px] items-center flex-col">
-            <Text>
-              {" "}
-              {isBiometricSupported
-                ? "Your device is compatible with Biometrics"
-                : "Face or Fingerprint scanner is available on this device"}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={handleBiometricAuth}
-            className="absolute bottom-10 bg-themeGreen w-full h-auto flex justify-center items-center rounded-[4px]"
+    <SafeAreaView className="h-full p-5">
+      <TouchableOpacity
+        // onPress={() => setotpPage(false)}
+        className="bg-themeGreen/10 border-[1px] border-themeGreen w-[78px] h-[35px] flex flex-row items-center justify-center rounded-[8px]"
+      >
+        <Image source={back} />
+        <Text className="text-[14px] ml-2 p-0 text-[#2F2F2F] font-normal">
+          Go Back
+        </Text>
+      </TouchableOpacity>
+      <Text className="text-[24px] mt-7 font-bold text-[#343434] font-DMSans">
+        Welcome back Musa, Enter your 4-Digit PIN
+      </Text>
+      <Text className="text-[14px] font-semibold mt-2 text-[#808080] font-DMSans">
+        If this is not your account, Log out
+      </Text>
+      <View className="flex flex-col justify-between pt-10 h-[80%]">
+        <Animated.View style={[styles.codeView, style]}>
+          {codeLength.map((_, index) => (
+            <View
+              key={index}
+              className="w-[64] border-[1px] h-[64] rounded-full flex justify-center items-center"
+            >
+              {code[index] && (
+                <Text className="text-[#343434] p-0 text-[30px] font-semibold font-DMSans">
+                  <Image source={exteriks} />
+                </Text>
+              )}
+            </View>
+          ))}
+        </Animated.View>
+
+        <View style={[styles.numbersView]}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
           >
-            <Text className="text-[16px] w-full h-full text-[#fff] text-center py-5 flex justify-center items-center font-bold">
-              Ok
-            </Text>
-          </TouchableOpacity>
+            {[1, 2, 3].map((number) => (
+              <TouchableOpacity
+                key={number}
+                onPress={() => onNumberPress(number)}
+              >
+                <Text style={styles.number}>{number}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            {[4, 5, 6].map((number) => (
+              <TouchableOpacity
+                key={number}
+                onPress={() => onNumberPress(number)}
+              >
+                <Text style={styles.number}>{number}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            {[7, 8, 9].map((number) => (
+              <TouchableOpacity
+                key={number}
+                onPress={() => onNumberPress(number)}
+              >
+                <Text style={styles.number}>{number}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity onPress={onBiometricPress}>
+              <FontAwesome6 name="fingerprint" size={26} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => onNumberPress(0)}>
+              <Text style={styles.number}>0</Text>
+            </TouchableOpacity>
+            <View style={{ minWidth: 25 }}>
+              {code.length > 0 && (
+                <TouchableOpacity onPress={numberBackSpace}>
+                  <Ionicons name="chevron-back-sharp" size={24} color="red" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flexGrow: 1,
+  greetings: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginTop: 80,
+    alignSelf: "center",
+  },
+  codeView: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: 20,
+  },
+  codeEmpty: {
+    width: 64,
+    height: 64,
+
+    borderRadius: 50,
+    backgroundColor: "#000",
+  },
+  numbersView: {
+    marginHorizontal: 20,
+    marginVertical: 10,
+    gap: 1,
+  },
+  number: {
+    fontSize: 24,
+    padding: 20,
+    color: "#363853",
+    fontWeight: "semibold",
+    borderRadius: 50,
   },
 });
 

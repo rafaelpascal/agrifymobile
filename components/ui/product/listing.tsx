@@ -38,7 +38,7 @@ export const BaseItem = (props: DashboardCardProps) => {
             </Text>
             {status === true ? (
               <View className="flex justify-center items-start rounded-[4px] bg-themeGreen/10">
-                <Text className="w-auto px-3 font-normal h-auto text-[12px] text-themeGreen py-[3px]">
+                <Text className="w-auto px-3 font-normal h-auto text-[14px] text-themeGreen py-[3px]">
                   Sold
                 </Text>
               </View>

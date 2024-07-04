@@ -23,7 +23,10 @@ export const PreviousItems = (props: DashboardCardProps) => {
 
   const newVal = currencyFormatter.format(value);
   return (
-    <View className="w-full border-[2px] flex flex-row justify-between items-center border-[#E6E6E8] h-[74px] my-[4px] rounded-[8px] px-[10px] py-3">
+    <TouchableOpacity
+      onPress={onItemPressed}
+      className="w-full border-[2px] flex flex-row justify-between items-center border-[#E6E6E8] h-[74px] my-[4px] rounded-[8px] px-[10px] py-3"
+    >
       <View className="flex flex-row justify-start items-center">
         {icon ? (
           <Image
@@ -51,7 +54,7 @@ export const PreviousItems = (props: DashboardCardProps) => {
             </Text>
             {status === true ? (
               <View className="flex justify-center items-start rounded-[4px] bg-themeGreen/10">
-                <Text className="w-auto px-3 font-normal h-auto text-[12px] text-themeGreen py-[3px]">
+                <Text className="w-auto px-3 font-normal h-auto text-[14px] text-themeGreen py-[3px]">
                   Sold
                 </Text>
               </View>
@@ -66,10 +69,10 @@ export const PreviousItems = (props: DashboardCardProps) => {
         </View>
       </View>
       <TouchableOpacity onPress={onItemPressed}>
-        <Text className="text-[#415BE6] text-[12px] font-semibold font-DMSans">
+        <Text className="text-[#415BE6] text-[14px] font-semibold font-DMSans">
           View details
         </Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };

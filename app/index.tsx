@@ -132,6 +132,8 @@ export default function HomeScreen() {
     const get_device = async () => {
       try {
         const device = await get_deviceId(retrieveddeviceid);
+        console.log(device);
+
         if (device.data && device.data.device && device.data.device.deviceId) {
           setdbDeviceId(true);
         } else {
@@ -194,10 +196,10 @@ export default function HomeScreen() {
                   className="w-[98px] h-[58px] gap-4 flex flex-row justify-between items-center"
                   onPress={() => changeLanguage(option.abbreviation)}
                 >
-                  <Text className=" text-left text-[12px] font-DMSans text-[#808080]">
+                  <Text className=" text-left text-[14px] font-DMSans text-[#808080]">
                     {option.name}
                   </Text>
-                  <Text className=" text-left text-[12px] font-DMSans text-[#808080]">
+                  <Text className=" text-left text-[14px] font-DMSans text-[#808080]">
                     {selectedValue === option.abbreviation && (
                       <MaterialIcons name="check" size={20} color="black" />
                     )}

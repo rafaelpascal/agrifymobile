@@ -17,7 +17,7 @@ export const DashboardCard = (props: DashboardCardProps) => {
       <View className="w-[114px] h-auto border-[1px] border-[#343434] rounded-[8px] bg-[#FDF9F4]">
         <View className="p-[8px]">
           <Image source={icon} />
-          <Text className="mt-2 text-[12px] font-semibold font-DMSans">
+          <Text className="mt-2 text-[14px] font-semibold font-DMSans">
             {title}
           </Text>
         </View>

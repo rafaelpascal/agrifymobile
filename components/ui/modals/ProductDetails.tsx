@@ -90,7 +90,7 @@ export const ProductDetails = ({
 
   return (
     <BaseModal userId={userId} isOpen={isOpen} closeModal={closeModal}>
-      <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[12px] flex justify-between items-center w-full">
+      <View className="bg-themeGreen/10 h-[48px] flex-row px-4 rounded-[14px] flex justify-between items-center w-full">
         <Text className="text-[16px] font-bold font-DMSans text-themeGreen">
           Product Details
         </Text>

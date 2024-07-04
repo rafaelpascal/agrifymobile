@@ -66,6 +66,25 @@ export const createpin = async (data: object) => {
   }
 };
 
+// create Pin
+export const sign_in = async (data: object) => {
+  try {
+    const response = await axios.post(
+      `${StringapiUrl}/api/auth/sign_in`,
+      data,
+      {
+        headers: {
+          "x-api-key": `${key}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // get marchant
 export const marchant_acc = async (marchantId: string) => {
   try {

@@ -1,12 +1,40 @@
 import { Avatar } from "../../avatar";
 import { View, Image, Text, TouchableOpacity } from "react-native";
 const avatar = require("../../../../assets/images/avatar.png");
+import { useNavigation } from "@react-navigation/native";
+import {
+  CompositeNavigationProp,
+  NavigatorScreenParams,
+} from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
 export interface TopNavProps {
   title: string;
 }
 
+type RootStackParamList = {
+  "(tabs)": NavigatorScreenParams<TabParamList>;
+  "+not-found": undefined;
+  Other: undefined;
+};
+
+type TabParamList = {
+  Settings: undefined;
+};
+
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<RootStackParamList, "(tabs)">,
+  BottomTabNavigationProp<TabParamList>
+>;
+
 export const TopNav = ({ title }: TopNavProps) => {
+  const navigation = useNavigation<NavigationProp>();
+
+  const handleNavSettings = () => {
+    navigation.navigate("(tabs)", { screen: "Settings" });
+  };
+
   return (
     <View className="flex flex-row w-full justify-between items-center mt-10 max-md:items-center">
       <View>
@@ -18,6 +46,7 @@ export const TopNav = ({ title }: TopNavProps) => {
         avatarClassName="md:h-11 h-36px w-36px rounded-full md:w-11"
         textClassName="font-medium text-sm max-md:hidden"
         wrapperClassName="max-md:gap-0"
+        onPress={handleNavSettings}
       ></Avatar>
     </View>
   );
