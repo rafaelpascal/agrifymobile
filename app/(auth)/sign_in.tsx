@@ -25,6 +25,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { useUser } from "../../context/user-provider";
 
 type RootStackParamList = {
   // "(auth)": NavigatorScreenParams<AuthStackParamList>;
@@ -46,6 +47,7 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 const SignIn = () => {
+  const { user, setUser } = useUser();
   const navigation = useNavigation<NavigationProp>();
   const [code, setCode] = useState<number[]>([]);
   const [isBiometricSupported, setisBiometricSupported] = useState(false);
@@ -165,6 +167,7 @@ const SignIn = () => {
           };
           const singin = await sign_in(data);
           if (singin.data.code === "00") {
+            setUser(singin.data.updatedUsr.id);
             navigation.navigate("(tabs)", { screen: "Home" });
             setCode([]);
           }
@@ -210,7 +213,7 @@ const SignIn = () => {
       setIsAuthenticated(success);
       if (success) {
         console.log("Biometric authentication successful");
-        router.push("/tabs/index");
+        router.push("/tabs/Home");
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
@@ -313,7 +316,10 @@ const SignIn = () => {
               alignItems: "center",
             }}
           >
-            <TouchableOpacity onPress={onBiometricPress}>
+            <TouchableOpacity
+              style={{ marginLeft: 5 }}
+              onPress={onBiometricPress}
+            >
               <FontAwesome6 name="fingerprint" size={26} color="black" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onNumberPress(0)}>

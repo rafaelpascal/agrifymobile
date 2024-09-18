@@ -204,7 +204,7 @@ const payment_page = () => {
     >
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollView}>
-          <View className="h-full relative w-full">
+          <View className="h-[90vh] relative w-full">
             <View className=" w-full px-3">
               <TouchableOpacity
                 onPress={handleGoback}

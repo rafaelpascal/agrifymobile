@@ -129,11 +129,13 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
+    console.log(deviceInfo);
+  }, [deviceInfo]);
+
+  useEffect(() => {
     const get_device = async () => {
       try {
         const device = await get_deviceId(retrieveddeviceid);
-        console.log(device);
-
         if (device.data && device.data.device && device.data.device.deviceId) {
           setdbDeviceId(true);
         } else {
@@ -187,7 +189,7 @@ export default function HomeScreen() {
           />
           <View className="w-[233px] h-[209px] flex justify-start p-1 items-center flex-col">
             <Text className="text-themeGreen font-semibold text-[16px]">
-              Select your preferred language
+              Select your preferred language.
             </Text>
             <View className="mt-4">
               {options.map((option, index) => (

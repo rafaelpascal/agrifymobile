@@ -262,17 +262,17 @@ const Addproduct = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1 w-full px-3"
-      >
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1"
+    >
+      <SafeAreaView style={styles.container}>
         <ScrollView
           contentContainerStyle={styles.scrollView}
           showsVerticalScrollIndicator={false}
         >
           {isreview ? (
-            <View className="w-full h-[90vh]">
+            <View className="w-full h-[90vh] px-3">
               <TouchableOpacity
                 onPress={() => setPreview(false)}
                 className="bg-themeGreen/10 w-[78px] h-[35px] flex justify-center items-center flex-row rounded-md"
@@ -408,7 +408,7 @@ const Addproduct = () => {
               </View>
             </View>
           ) : (
-            <View className="w-full h-full">
+            <View className="w-full h-[90vh] px-3">
               {iscameraActive ? (
                 <View className="w-full relative h-[90vh]">
                   <TouchableOpacity
@@ -626,7 +626,7 @@ const Addproduct = () => {
                   </View>
                 </View>
               ) : (
-                <View className="h-[90vh]">
+                <View className="h-[90vh] min-h-[100%]">
                   <TouchableOpacity
                     onPress={handleContinue}
                     className="bg-themeGreen/10 w-[78px] h-[35px] flex justify-center items-center flex-row rounded-md"
@@ -731,14 +731,6 @@ const Addproduct = () => {
                             Select your product
                           </Text>
                         )}
-                        {/* <CustomDropdown
-                                  options={pname}
-                                  placeholder="Select your product"
-                                  InputClass="top-[47%]"
-                                  selectedValue={productName}
-                                  isLoading={loading}
-                                  onSelect={(value) => setproductName(value)}
-                                /> */}
                         {namemodalVisible && (
                           <View className="w-full absolute top-[100%] rounded-[4px]">
                             <View className="w-full h-full flex transition-[.5s] flex-1 justify-center items-center">
@@ -933,29 +925,29 @@ const Addproduct = () => {
               )}
             </View>
           )}
+          <ProductCreated
+            userId={message}
+            isOpen={isModalOpen}
+            handleContinue={handleContinue}
+            closeModal={handleModalClose}
+          />
         </ScrollView>
-      </KeyboardAvoidingView>
-      <ProductCreated
-        userId={message}
-        isOpen={isModalOpen}
-        handleContinue={handleContinue}
-        closeModal={handleModalClose}
-      />
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   scrollView: {
-    paddingBottom: 10,
     flexGrow: 1,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 500,
   },
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    
   },
 });
 export default Addproduct;

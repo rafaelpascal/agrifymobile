@@ -25,7 +25,7 @@ const getData = async () => {
   }
 };
 
-const LOCK_TIME = 3000;
+const LOCK_TIME = 30000;
 
 export const UserInactivityProvider = ({ children }: any) => {
   const appState = useRef(AppState.currentState);
@@ -42,7 +42,6 @@ export const UserInactivityProvider = ({ children }: any) => {
   }, []);
 
   const handleAppStateChange = async (nextAppState: any) => {
-    console.log("appState", appState.current, nextAppState);
     if (nextAppState === "inactive") {
       router.push("/(modals)/inactive");
     } else {

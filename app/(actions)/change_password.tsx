@@ -123,7 +123,7 @@ const change_password = () => {
     >
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollView}>
-          <View className="w-full h-[100vh] px-3">
+          <View className="w-full h-[90vh] px-3">
             {isConfirmPass ? (
               <>
                 {otpPage ? (
@@ -306,26 +306,26 @@ const change_password = () => {
             )}
           </View>
         </ScrollView>
+        <ProductCreated
+          userId="Your PIN has been changed successfully."
+          isOpen={pinchangedmodal}
+          handleContinue={handleContinue}
+          closeModal={handleModalClose}
+        />
       </SafeAreaView>
-      <ProductCreated
-        userId="Your PIN has been changed successfully."
-        isOpen={pinchangedmodal}
-        handleContinue={handleContinue}
-        closeModal={handleModalClose}
-      />
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   scrollView: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
 });
 

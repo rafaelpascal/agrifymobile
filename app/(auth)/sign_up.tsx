@@ -30,6 +30,8 @@ import OTPTextInput from "react-native-otp-textinput";
 import { CreatedModal } from "../../components/ui/modals/CreatedModal";
 import { register, verifyacc, createpin } from "../../utils/apiService";
 import { Accountexist } from "../../components/ui/modals/Accountexist";
+import * as Device from "expo-device";
+import * as Application from "expo-application";
 import {
   CompositeNavigationProp,
   NavigatorScreenParams,
@@ -56,7 +58,7 @@ type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList>
 >;
 const SignUp = () => {
-  const { user, setUser } = useUser();
+  const { setUser } = useUser();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [selectedValue, setSelectedValue] = useState("");
   const [otp, setOTP] = useState("");
@@ -69,7 +71,6 @@ const SignUp = () => {
   const [isTimedOut, setIsTimedOut] = useState<boolean>(false);
   const [isConfirmPass, setisConfirmPass] = useState<boolean>(false);
   const [isExistModalOpen, setIsExistModalOpen] = useState(false);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [states, setStates] = useState<string[]>([]);
@@ -78,12 +79,27 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
   const [pin, setPin] = useState("");
   const [capitals, setCapitals] = useState([]);
+  const [retrieveddeviceid, setretrieveddeviceid] = useState("");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
+    deviceId: "",
+  });
+
+  const [deviceInfo, setDeviceInfo] = useState({
+    brand: "",
+    model: "",
+    systemName: "",
+    systemVersion: "",
+    uniqueId: "",
+    deviceType: "",
+    manufacturer: "",
+    totalMemory: "",
+    isTablet: "",
+    isDevice: "",
   });
 
   const handleOTPChange = (otp: string) => {
@@ -93,6 +109,69 @@ const SignUp = () => {
   const handleInputChange = (value: string, name: string) => {
     setFormData({ ...formData, [name]: value });
   };
+
+  useEffect(() => {
+    const fetchDeviceInfo = async () => {
+      const brand = Device.brand || "Unknown";
+      const model = Device.modelName || "Unknown";
+      const systemName = Device.osName || "Unknown";
+      const systemVersion = Device.osVersion || "Unknown";
+
+      // Fetch unique ID based on platform
+      // Fetch unique ID based on platform
+      let uniqueId = "Unknown";
+      if (Device.osName === "Android") {
+        uniqueId = Application.getAndroidId() || "Unknown";
+      } else if (Device.osName === "iOS") {
+        uniqueId = (await Application.getIosIdForVendorAsync()) || "Unknown";
+      }
+
+      let deviceType = "Unknown";
+      switch (Device.deviceType) {
+        case Device.DeviceType.PHONE:
+          deviceType = "Phone";
+          break;
+        case Device.DeviceType.TABLET:
+          deviceType = "Tablet";
+          break;
+        case Device.DeviceType.DESKTOP:
+          deviceType = "Desktop";
+          break;
+        case Device.DeviceType.TV:
+          deviceType = "TV";
+          break;
+      }
+
+      const manufacturer = Device.manufacturer || "Unknown";
+      const totalMemory = Device.totalMemory
+        ? `${Device.totalMemory} bytes`
+        : "Unknown";
+      const isDevice = Device.isDevice ? "Yes" : "No";
+
+      const info = {
+        brand,
+        model,
+        systemName,
+        systemVersion,
+        uniqueId,
+        deviceType,
+        manufacturer,
+        totalMemory,
+        isTablet: deviceType === "Tablet" ? "Yes" : "No",
+        isDevice,
+      };
+
+      setDeviceInfo(info);
+      setretrieveddeviceid(info.uniqueId);
+    };
+
+    fetchDeviceInfo();
+  }, []);
+
+  useEffect(() => {
+    console.log(retrieveddeviceid);
+  }, [retrieveddeviceid]);
+
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -123,24 +202,26 @@ const SignUp = () => {
     try {
       setOtpPage(true);
 
-      // const data = {
-      //   firstName: formData.firstName,
-      //   lastName: formData.lastName,
-      //   location: selectedValue,
-      //   phone: formData.phone,
-      //   email: formData.email,
-      // };
+      const data = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        location: selectedValue,
+        phone: formData.phone,
+        email: formData.email,
+        deviceId: retrieveddeviceid,
+      };
 
-      // await register(data);
-      // setEmail(formData.email);
-      // setName(formData.firstName);
-      // setOtpPage(true);
-      // setFormData({
-      //   firstName: "",
-      //   lastName: "",
-      //   phone: "",
-      //   email: "",
-      // });
+      await register(data);
+      setEmail(formData.email);
+      setName(formData.firstName);
+      setOtpPage(true);
+      setFormData({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: "",
+        deviceId: "",
+      });
     } catch (error: any) {
       setMessage(error.response.data.message);
       setIsExistModalOpen(true);
@@ -176,14 +257,14 @@ const SignUp = () => {
     try {
       setispassWord(true);
 
-      // const data = {
-      //   otp,
-      //   email,
-      // };
-      // const verifyres = await verifyacc(data);
-      // if (verifyres) {
-      //   setispassWord(true);
-      // }
+      const data = {
+        otp,
+        email,
+      };
+      const verifyres = await verifyacc(data);
+      if (verifyres) {
+        setispassWord(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -191,14 +272,12 @@ const SignUp = () => {
 
   const handleSubmitform = async () => {
     try {
-      // const data = {
-      //   pin,
-      //   email,
-      // };
-      // const res = await createpin(data);
-      // setUser(res.data.fndmarId.id);
-      const user = "087a8b59-6f41-4d27-8ce3-f6c603294829";
-      setUser(user);
+      const data = {
+        pin,
+        email,
+      };
+      const res = await createpin(data);
+      setUser(res.data.fndmarId.id);
       setIsModalOpen(true);
       setClear(true);
     } catch (error) {
@@ -220,7 +299,7 @@ const SignUp = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1"
     >
-      <SafeAreaView>
+      <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollView}>
           {otpPage ? (
             <>
@@ -618,6 +697,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
 });
 

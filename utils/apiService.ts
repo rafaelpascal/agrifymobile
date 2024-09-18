@@ -168,6 +168,8 @@ export const product_names = async (catId: string) => {
 
 // Marchant get product names
 export const get_previous_sales = async (marchantId: string) => {
+  console.log(marchantId);
+
   try {
     const response = await axios.get(
       `${StringapiUrl}/api/marchant_order/get_previous_sales/${marchantId}`,
@@ -213,8 +215,6 @@ export const get_all_order = async (marchantId: string) => {
     );
     return response.data;
   } catch (error) {
-    console.log(error);
-
     return error;
   }
 };

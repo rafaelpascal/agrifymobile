@@ -32,6 +32,7 @@ import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 const product = require("../../assets/images/product.png");
 const sales = require("../../assets/images/sales.png");
 const stock = require("../../assets/images/stock.png");
+const stocksvg = require("../../assets/icon/stock.svg");
 const plus = require("../../assets/images/plus.png");
 
 type ViewItem = {
@@ -105,7 +106,6 @@ export default function HomeScreen() {
     const getallOrder = async () => {
       try {
         const all_previous_sales = await get_all_order(user);
-
         const previoussales = all_previous_sales?.completed_sales.rows;
         const totalOrder = all_previous_sales?.completed_sales.count;
 
@@ -123,6 +123,8 @@ export default function HomeScreen() {
         setistotalOrder(totalOrder);
         setItems(transformedData);
       } catch (error: any) {
+        console.log(error);
+
         if (error.response) {
           console.log("Response Data:", error.response.data);
           console.log("Response Status:", error.response.status);
@@ -232,16 +234,18 @@ export default function HomeScreen() {
                 <Text className="mt-2 text-[14px] text-[#8F94A8] font-DMSans font-normal">
                   Today
                 </Text>
-                {items.map((item, index) => (
-                  <BaseItem
-                    key={index}
-                    icon={item.icon}
-                    title={item.title}
-                    qty={item.qty}
-                    status={item.status}
-                    value={item.value}
-                  />
-                ))}
+                <>
+                  {items.map((item, index) => (
+                    <BaseItem
+                      key={index}
+                      icon={item.icon}
+                      title={item.title}
+                      qty={item.qty}
+                      status={item.status}
+                      value={item.value}
+                    />
+                  ))}
+                </>
               </View>
             </ScrollView>
           </View>
