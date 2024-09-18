@@ -219,8 +219,10 @@ const Addproduct = () => {
   };
 
   const handleFormsubmit = async () => {
+    console.log(user);
     try {
       const formData = {
+        marchantId: user,
         category: selectedValue,
         productName: productName,
         pricing: inputs,
@@ -228,6 +230,8 @@ const Addproduct = () => {
         images: capturedImages,
       };
       const res = await new_product(formData);
+      console.log(res);
+
       if (res) {
         setMessage("Your product has been added to your store");
         setIsModalOpen(true);
@@ -947,7 +951,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    
   },
 });
 export default Addproduct;

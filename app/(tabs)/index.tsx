@@ -106,6 +106,7 @@ export default function HomeScreen() {
     const getallOrder = async () => {
       try {
         const all_previous_sales = await get_all_order(user);
+
         const previoussales = all_previous_sales?.completed_sales.rows;
         const totalOrder = all_previous_sales?.completed_sales.count;
 
@@ -142,6 +143,8 @@ export default function HomeScreen() {
     const getallproduct = async () => {
       try {
         const allproduct = await all_product();
+        console.log(allproduct);
+
         const all_previous_sales = await get_previous_sales(user);
         const previoussales = all_previous_sales?.completed_sales.rows;
         const productCount = allproduct.data?.allproduct.count;
