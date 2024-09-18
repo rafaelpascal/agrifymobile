@@ -136,7 +136,7 @@ export default function HomeScreen() {
       }
     };
     getallOrder();
-  }, []);
+  }, [user]);
 
   //get all product
   useEffect(() => {
@@ -182,7 +182,7 @@ export default function HomeScreen() {
       }
     };
     getallproduct();
-  }, []);
+  }, [user]);
 
   // Get marchant account
   const marchant = async () => {

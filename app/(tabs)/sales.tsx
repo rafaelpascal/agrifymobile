@@ -178,72 +178,77 @@ export default function Sales() {
   });
 
   useEffect(() => {
-    const getprevioussales = async () => {
-      try {
-        const all_previous_sales = await get_previous_sales(user);
-        const previoussales = all_previous_sales?.completed_sales.rows;
+    if (user) {
+      const getprevioussales = async () => {
+        try {
+          const all_previous_sales = await get_previous_sales(user);
+          const previoussales = all_previous_sales?.completed_sales.rows;
 
-        const transformedData = previoussales.map((sales: any) => {
-          const firstImage = sales.product.images[0];
-          return {
-            id: sales.id,
-            icon: firstImage.imageUrl,
-            category: sales.product.category,
-            title: sales.product.productName,
-            qty: `${sales.qty}`,
-            status: sales.status || false,
-            value: sales.amount,
-            amount: parseFloat(sales.amount),
-          };
-        });
+          const transformedData = previoussales.map((sales: any) => {
+            const firstImage = sales.product.images[0];
+            return {
+              id: sales.id,
+              icon: firstImage.imageUrl,
+              category: sales.product.category,
+              title: sales.product.productName,
+              qty: `${sales.qty}`,
+              status: sales.status || false,
+              value: sales.amount,
+              amount: parseFloat(sales.amount),
+            };
+          });
 
-        // Sum up the total sales amount
-        const totalSalesAmount = transformedData.reduce(
-          (sum: number, sale: ViewItem) => sum + sale.amount,
-          0
-        );
-        const newamout = currencyFormatter.format(totalSalesAmount);
-        setPreviousTotal(newamout);
-        setpreviousItem(transformedData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getprevioussales();
+          // Sum up the total sales amount
+          const totalSalesAmount = transformedData.reduce(
+            (sum: number, sale: ViewItem) => sum + sale.amount,
+            0
+          );
+          const newamout = currencyFormatter.format(totalSalesAmount);
+          setPreviousTotal(newamout);
+          setpreviousItem(transformedData);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getprevioussales();
+    }
   }, [user]);
 
   useEffect(() => {
-    const getpendingorder = async () => {
-      try {
-        const all_pending_sales = await get_pending_order(user);
-        const pendingorder = all_pending_sales?.completed_sales.rows;
-        const transformedData = pendingorder.map((sales: any) => {
-          const firstImage = sales.product.images[0];
-          return {
-            id: sales.id,
-            icon: firstImage.imageUrl,
-            category: sales.product.category,
-            title: sales.product.productName,
-            qty: `${sales.qty}`,
-            status: sales.status || false,
-            value: sales.amount,
-            amount: parseFloat(sales.amount),
-          };
-        });
+    if (user) {
+      const getpendingorder = async () => {
+        try {
+          const all_pending_sales = await get_pending_order(user);
 
-        const totalSalesAmount = transformedData.reduce(
-          (sum: number, sale: ViewItem) => sum + sale.amount,
-          0
-        );
-        const newamout = currencyFormatter.format(totalSalesAmount);
-        setPendingTotal(newamout);
-        setpendings(transformedData);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getpendingorder();
-  }, []);
+          const pendingorder = all_pending_sales?.completed_sales.rows;
+          const transformedData = pendingorder.map((sales: any) => {
+            const firstImage = sales.product.images[0];
+            return {
+              id: sales.id,
+              icon: firstImage.imageUrl,
+              category: sales.product.category,
+              title: sales.product.productName,
+              qty: `${sales.qty}`,
+              status: sales.status || false,
+              value: sales.amount,
+              amount: parseFloat(sales.amount),
+            };
+          });
+
+          const totalSalesAmount = transformedData.reduce(
+            (sum: number, sale: ViewItem) => sum + sale.amount,
+            0
+          );
+          const newamout = currencyFormatter.format(totalSalesAmount);
+          setPendingTotal(newamout);
+          setpendings(transformedData);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getpendingorder();
+    }
+  }, [user]);
 
   return (
     <KeyboardAvoidingView
